@@ -837,6 +837,8 @@ MonoBehaviour:
   - {fileID: 3694253023650902653, guid: 13150c06caedaf244ad7d77b42f1258a, type: 3}
   gridPerRow: 6
   maxTurn: 100
+  turnText: {fileID: 1060276616}
+  gridText: {fileID: 1316057055}
 --- !u!4 &1562499476
 Transform:
   m_ObjectHideFlags: 0
