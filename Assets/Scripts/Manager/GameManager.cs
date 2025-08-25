@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         turnRemain = maxTurn;
-        turnText.SetText("Turn left: " + turnRemain);
+        turnText.SetText("Turn remain: " + turnRemain);
         gridText.SetText("Current grid: " + currentGrid);
         playerObj.SetActive(true);
         InitGrid();
