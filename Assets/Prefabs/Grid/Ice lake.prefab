@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 155186448971950733}
   - component: {fileID: 7768495861535439312}
   m_Layer: 0
-  m_Name: Ice lake
+  m_Name: Ice Lake
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -167,12 +167,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -334,7 +334,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 2
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -358,8 +358,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.56, y: 2.72, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -927,17 +927,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdadb7c44820d6144b6e016fd0959ee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObj: {fileID: 510417601}
-  gridNum: 36
-  startGridObj: {fileID: 3694253023650902653, guid: 05dd3222658abff4eb7420fee9f3ef22, type: 3}
-  endGridObj: {fileID: 3694253023650902653, guid: c2e7b5fe09462f845b11904990c6dff5, type: 3}
-  gridObjs:
-  - {fileID: 3694253023650902653, guid: 2888971eab5d2af4bb6b9e4ec6215982, type: 3}
-  - {fileID: 3694253023650902653, guid: 13150c06caedaf244ad7d77b42f1258a, type: 3}
-  gridPerRow: 6
+  player: {fileID: 510417601}
+  gridNum: 100
+  startGrid: {fileID: 11400000, guid: bf29b2c655878074989f7dae4ecfe5e6, type: 2}
+  emptyGrid: {fileID: 11400000, guid: e33a4938af9b3d845a3c5d44b027e351, type: 2}
+  endGrid: {fileID: 11400000, guid: 4f474520a19af144587ce6da5d2c551b, type: 2}
+  cloud: {fileID: 3694253023650902653, guid: f10187c162338c64880aa155b411ef31, type: 3}
+  gridTypes:
+  - {fileID: 11400000, guid: 7ceb3b16eea7cf64689d48f4e0115e21, type: 2}
+  - {fileID: 11400000, guid: 5b5ed8b87bf16324fabe42da6912cfa2, type: 2}
+  - {fileID: 11400000, guid: 6f6725b55ff4c234e925134a99dc4117, type: 2}
+  - {fileID: 11400000, guid: 121c416c93ae678429b6d33e4da7b4f4, type: 2}
+  - {fileID: 11400000, guid: bd13f6cc8adbc71469901c9f52b7d8a9, type: 2}
+  - {fileID: 11400000, guid: 66d08573d994fe741b122c2f72ab08c8, type: 2}
+  - {fileID: 11400000, guid: ab766a3166c0eed4fba6507011db6d1e, type: 2}
+  - {fileID: 11400000, guid: 4771e9177b29cb44c971cf722738ba7f, type: 2}
+  gridPerRow: 10
   maxTurn: 100
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
+  vision: 2
 --- !u!4 &1562499476
 Transform:
   m_ObjectHideFlags: 0
@@ -968,6 +977,22 @@ PrefabInstance:
     - target: {fileID: 1935152129690754035, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4034093360463539910, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_LocalPosition.x

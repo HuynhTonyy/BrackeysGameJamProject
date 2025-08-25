@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 4609047006443661557}
   - component: {fileID: 3713678638028895005}
   m_Layer: 0
-  m_Name: Grid End
+  m_Name: End
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
