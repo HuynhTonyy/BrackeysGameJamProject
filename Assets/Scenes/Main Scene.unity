@@ -295,23 +295,23 @@ MonoBehaviour:
   - m_EditModeType: 1
     m_Knots:
     - Position:
-        x: 100
+        x: 1500
         y: -50
         z: 0
       TangentIn:
         x: -0
         y: -0
-        z: -90.13878
+        z: -50.24938
       TangentOut:
         x: 0
         y: 0
-        z: 90.13878
+        z: 50.24938
       Rotation:
         value:
-          x: -0.51368034
-          y: 0.48593467
-          z: -0.48593467
-          w: 0.51368034
+          x: -0.52428615
+          y: -0.4744724
+          z: 0.4744724
+          w: 0.5242861
     - Position:
         x: 1000
         y: 0
@@ -331,7 +331,7 @@ MonoBehaviour:
           z: -0.5
           w: -0.49999976
     - Position:
-        x: 1500
+        x: 500
         y: -50
         z: 0
       TangentIn:
@@ -344,10 +344,10 @@ MonoBehaviour:
         z: 50.24938
       Rotation:
         value:
-          x: 0.47447252
-          y: -0.52428603
-          z: 0.5242862
-          w: -0.47447228
+          x: -0.4744725
+          y: -0.5242861
+          z: 0.52428615
+          w: 0.47447237
     m_MetaData:
     - Mode: 0
       Tension: 0.5
@@ -1055,7 +1055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 510417601}
-  gridNum: 36
+  gridNum: 100
   startGrid: {fileID: 11400000, guid: bf29b2c655878074989f7dae4ecfe5e6, type: 2}
   emptyGrid: {fileID: 11400000, guid: e33a4938af9b3d845a3c5d44b027e351, type: 2}
   endGrid: {fileID: 11400000, guid: 4f474520a19af144587ce6da5d2c551b, type: 2}
@@ -1069,7 +1069,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66d08573d994fe741b122c2f72ab08c8, type: 2}
   - {fileID: 11400000, guid: ab766a3166c0eed4fba6507011db6d1e, type: 2}
   - {fileID: 11400000, guid: 4771e9177b29cb44c971cf722738ba7f, type: 2}
-  gridPerRow: 6
+  gridPerRow: 10
   maxTurn: 100
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
@@ -1083,7 +1083,7 @@ Transform:
   m_GameObject: {fileID: 1562499474}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.28051, y: 0.95046, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
