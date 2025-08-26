@@ -216,6 +216,8 @@ RectTransform:
   - {fileID: 1060276615}
   - {fileID: 1316057054}
   - {fileID: 1322755016}
+  - {fileID: 513854675}
+  - {fileID: 1621976632}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -228,6 +230,142 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1935152129690754035, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
   m_PrefabInstance: {fileID: 1957156034}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &513854674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 513854675}
+  - component: {fileID: 513854676}
+  m_Layer: 0
+  m_Name: HandSpline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &513854675
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513854674}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 130497558}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &513854676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513854674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots:
+    - Position:
+        x: 100
+        y: -50
+        z: 0
+      TangentIn:
+        x: -0
+        y: -0
+        z: -90.13878
+      TangentOut:
+        x: 0
+        y: 0
+        z: 90.13878
+      Rotation:
+        value:
+          x: -0.51368034
+          y: 0.48593467
+          z: -0.48593467
+          w: 0.51368034
+    - Position:
+        x: 1000
+        y: 0
+        z: 0
+      TangentIn:
+        x: 0
+        y: 0
+        z: -300
+      TangentOut:
+        x: 0
+        y: 0
+        z: 300
+      Rotation:
+        value:
+          x: 0.50000024
+          y: 0.5
+          z: -0.5
+          w: -0.49999976
+    - Position:
+        x: 1500
+        y: -50
+        z: 0
+      TangentIn:
+        x: -0
+        y: -0
+        z: -50.24938
+      TangentOut:
+        x: 0
+        y: 0
+        z: 50.24938
+      Rotation:
+        value:
+          x: 0.47447252
+          y: -0.52428603
+          z: 0.5242862
+          w: -0.47447228
+    m_MetaData:
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 2
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,7 +497,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.56, y: 2.72, z: -10}
+  m_LocalPosition: {x: 5.49, y: 3.79, z: -2.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -800,6 +938,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1316057053}
   m_CullTransparentMesh: 1
+--- !u!1 &1317741913
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1317741914}
+  - component: {fileID: 1317741915}
+  m_Layer: 0
+  m_Name: Hand Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1317741914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317741913}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.18017, y: 4.42171, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1317741915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317741913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604cd76c251660445b3ceb0840174bca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxCardSize: 6
+  spawnPoint: {fileID: 1621976631}
+  splineContainer: {fileID: 513854676}
+  cardTypes:
+  - {fileID: 11400000, guid: 597bd3e8ff74b1e459a0d3671cd5c55a, type: 2}
+  - {fileID: 11400000, guid: ad9ffe12b6c455b43b79d095f0727462, type: 2}
+  - {fileID: 11400000, guid: f5a93e51d0099274884e4427e19bfd00, type: 2}
+  hand: {fileID: 1322755015}
 --- !u!1 &1322755015
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,9 +999,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1322755016}
-  - component: {fileID: 1322755017}
-  - component: {fileID: 1322755019}
-  - component: {fileID: 1322755018}
   m_Layer: 5
   m_Name: CardHand
   m_TagString: Untagged
@@ -838,66 +1025,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 150}
   m_Pivot: {x: 0.5, y: 0}
---- !u!114 &1322755017
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1322755015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: -50
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 1
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &1322755018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1322755015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5233c935f7d84d4e9fee2e2de84b710, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  defaultCardHand:
-  - {fileID: 11400000, guid: 597bd3e8ff74b1e459a0d3671cd5c55a, type: 2}
-  - {fileID: 11400000, guid: ad9ffe12b6c455b43b79d095f0727462, type: 2}
-  - {fileID: 11400000, guid: f5a93e51d0099274884e4427e19bfd00, type: 2}
-  - {fileID: 11400000, guid: f5a93e51d0099274884e4427e19bfd00, type: 2}
-  - {fileID: 11400000, guid: ad9ffe12b6c455b43b79d095f0727462, type: 2}
-  - {fileID: 11400000, guid: 597bd3e8ff74b1e459a0d3671cd5c55a, type: 2}
-  CardPrefab: {fileID: 2181425988099683369, guid: 691544fb240f45142a3f1701ffe243d1, type: 3}
---- !u!114 &1322755019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1322755015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 1
-  m_VerticalFit: 0
 --- !u!1 &1562499474
 GameObject:
   m_ObjectHideFlags: 0
@@ -928,7 +1055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 510417601}
-  gridNum: 100
+  gridNum: 36
   startGrid: {fileID: 11400000, guid: bf29b2c655878074989f7dae4ecfe5e6, type: 2}
   emptyGrid: {fileID: 11400000, guid: e33a4938af9b3d845a3c5d44b027e351, type: 2}
   endGrid: {fileID: 11400000, guid: 4f474520a19af144587ce6da5d2c551b, type: 2}
@@ -942,7 +1069,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66d08573d994fe741b122c2f72ab08c8, type: 2}
   - {fileID: 11400000, guid: ab766a3166c0eed4fba6507011db6d1e, type: 2}
   - {fileID: 11400000, guid: 4771e9177b29cb44c971cf722738ba7f, type: 2}
-  gridPerRow: 10
+  gridPerRow: 6
   maxTurn: 100
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
@@ -962,6 +1089,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1621976631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1621976632}
+  m_Layer: 0
+  m_Name: CardSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1621976632
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621976631}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 130497558}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1142, y: 596}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1957156034
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1049,3 +1211,4 @@ SceneRoots:
   - {fileID: 1957156034}
   - {fileID: 130497558}
   - {fileID: 621151537}
+  - {fileID: 1317741914}

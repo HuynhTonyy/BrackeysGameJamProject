@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5db9849d29a5349826102924288836, type: 3}
   m_Name: Card 1
   m_EditorClassIdentifier: 
-  cardName: Card Num 01
-  cardDescription: Pla pla
+  cardName: Minor Step
+  cardDescription: Player can move 1 tile forward,
+  cardType: 0
+  cardObject: {fileID: 2181425988099683369, guid: 691544fb240f45142a3f1701ffe243d1, type: 3}

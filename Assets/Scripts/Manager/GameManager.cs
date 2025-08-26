@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    clouds[i-1].SetActive(false);
+                    clouds[i - 1].GetComponent<Cloud>().Disappear();
                 }
             }
         }
@@ -120,24 +120,38 @@ public class GameManager : MonoBehaviour
     }
     void CheckClouds()
     {
-        for (int i = 0; i < clouds.Count; i++)
+        for (int i = 0; i <= vision; i++)
         {
-            if (i >= currentGrid - 1 && i < currentGrid + vision)
+            int cloudIndex = currentGrid - 1 + i;
+            if (cloudIndex <= clouds.Count)
             {
-                clouds[i].SetActive(false);
+                clouds[cloudIndex].GetComponent<Cloud>().Disappear();
+
             }
             else
             {
-                clouds[i].SetActive(true);
+                break;
             }
-            if (i < currentGrid - 1)
-            {
-                int randomIndex = Random.Range(0, gridTypes.Count);
-                GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
-                Destroy(grids[i + 1].Item2);    
-                grids[i + 1] =(gridTypes[randomIndex], gridObj);
-            }
+            
         }
+        // for (int i = 0; i < clouds.Count; i++)
+        // {
+        //     if (i >= currentGrid - 1 && i < currentGrid + vision)
+        //     {
+        //         clouds[i].SetActive(false);
+        //     }
+        //     else
+        //     {
+        //         clouds[i].SetActive(true);
+        //     }
+            // if (i < currentGrid - 1)
+            // {
+            //     int randomIndex = Random.Range(0, gridTypes.Count);
+            //     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
+            //     Destroy(grids[i + 1].Item2);    
+            //     grids[i + 1] =(gridTypes[randomIndex], gridObj);
+            // }
+        // }
     }
     void GridAction()
     {
