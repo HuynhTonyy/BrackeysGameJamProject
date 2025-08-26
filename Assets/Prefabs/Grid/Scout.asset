@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a74b6da3036924b900b181215e551a, type: 3}
+  m_Name: Scout
+  m_EditorClassIdentifier: 
+  gridType: 10
+  gameObject: {fileID: 3694253023650902653, guid: 601168e74311da74e8987b775bb36f49, type: 3}
