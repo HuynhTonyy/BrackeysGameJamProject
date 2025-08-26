@@ -132,10 +132,10 @@ public class GameManager : MonoBehaviour
             }
             if (i < currentGrid - 1)
             {
-                Destroy(grids[i + 1].Item2);
-                // int randomIndex = Random.Range(0, gridTypes.Count);
-                // grids[i + 1] = emptyGrid;
-                
+                int randomIndex = Random.Range(0, gridTypes.Count);
+                GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
+                Destroy(grids[i + 1].Item2);    
+                grids[i + 1] =(gridTypes[randomIndex], gridObj);
             }
         }
     }
@@ -201,21 +201,21 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator MoveForwardCoroutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         currentGrid += 1;
         PlayerMove(0);
         GridAction();
     }
     IEnumerator MoveBackwardCoroutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         currentGrid -= 1;
         PlayerMove(0);
         GridAction();
     }
     IEnumerator TeleportCoroutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         int min = 1;
         if (currentGrid - 6 > 1)
         {

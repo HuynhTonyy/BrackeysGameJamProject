@@ -928,7 +928,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 510417601}
-  gridNum: 36
+  gridNum: 100
   startGrid: {fileID: 11400000, guid: bf29b2c655878074989f7dae4ecfe5e6, type: 2}
   emptyGrid: {fileID: 11400000, guid: e33a4938af9b3d845a3c5d44b027e351, type: 2}
   endGrid: {fileID: 11400000, guid: 4f474520a19af144587ce6da5d2c551b, type: 2}
@@ -942,7 +942,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66d08573d994fe741b122c2f72ab08c8, type: 2}
   - {fileID: 11400000, guid: ab766a3166c0eed4fba6507011db6d1e, type: 2}
   - {fileID: 11400000, guid: 4771e9177b29cb44c971cf722738ba7f, type: 2}
-  gridPerRow: 6
+  gridPerRow: 10
   maxTurn: 100
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
