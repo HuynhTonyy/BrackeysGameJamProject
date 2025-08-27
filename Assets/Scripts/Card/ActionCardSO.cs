@@ -7,7 +7,7 @@ public class ActionCardSO : ScriptableObject
     public string cardName;
     public string cardDescription;
     public CardType cardType;
-    // public Sprite cardImage;
+    public GameObject cardObject;
 }
 
 public enum CardType

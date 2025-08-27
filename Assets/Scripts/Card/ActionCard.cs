@@ -12,6 +12,7 @@ public class ActionCard : MonoBehaviour
     [SerializeField] private TMP_Text cardNameText;
     [SerializeField] private TMP_Text cardDescriptionText;
     private Image borderCard;
+    [SerializeField] private int moveSteps = 1;
 
     void Awake()
     {

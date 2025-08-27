@@ -9,7 +9,7 @@ public class HandManager : MonoBehaviour
     [SerializeField] private int maxCardSize;
     [SerializeField] private GameObject spawnPoint;
     [SerializeField] private SplineContainer splineContainer;
-    [SerializeField] private GameObject card;
+    [SerializeField] private List<ActionCardSO> cardTypes;
     [SerializeField] private GameObject hand;
     private List<GameObject> cards = new();
 
@@ -27,27 +27,30 @@ public class HandManager : MonoBehaviour
             Debug.Log(worldPos);    
 
             Vector3 forward = spline.EvaluateTangent(currentPos);
-            // Vector3 up = spline.EvaluateUpVector(currentPos);
-            // Quaternion rotation = Quaternion.LookRotation
-            // (forward, Vector3.Cross(up, forward).normalized);
             float angle = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
             cards[i].GetComponent<RectTransform>()
-    .DOMove(worldPos, 0.25f);
-            // cards[i].transform.DOLocalRotateQuaternion(rotation, 0.25f);
+    .DOMove(worldPos, 1f);
             cards[i].GetComponent<RectTransform>()
-    .DORotate(new Vector3(0, 0, angle),0.25f);
+    .DORotate(new Vector3(0, 0, angle-180f),1f);
 
         }           
     }
 
     // Update is called once per frame
-    void DrawCard()
+    void DrawCard(GameObject card = null)
     {
         if (cards.Count >= maxCardSize) return;
-        GameObject cardSpawned = Instantiate(card, spawnPoint.transform.position, Quaternion.identity,hand.transform);
-        Debug.Log(cardSpawned.transform.position);
+        int index = Random.Range(0, cardTypes.Count);
+        GameObject cardSpawned = Instantiate(card==null?cardTypes[index].cardObject:card, spawnPoint.transform.position, Quaternion.identity,hand.transform);
         cards.Add(cardSpawned);
         UpdateCardPosition();
+    }
+    private void Start() {
+        for (int i = 0; i < maxCardSize/2; i++)
+        {
+            DrawCard(cardTypes[i].cardObject);
+            DrawCard(cardTypes[i].cardObject);
+        }
     }
     private void Update()
     {

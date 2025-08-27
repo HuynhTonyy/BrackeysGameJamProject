@@ -21,16 +21,17 @@ public class Cloud : MonoBehaviour
         {
             Transform cloudPart = gameObject.transform.GetChild(i);
             //get the direction 
-            Vector3 centerPoint = new Vector3(gameObject.transform.position.x + 0.5f, gameObject.transform.position.y + 0.5f, gameObject.transform.position.z);
+            Vector3 centerPoint = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
             Vector3 direction = (cloudPart.position - centerPoint).normalized;
             Debug.Log(direction);
-            cloudPart.DOMove(direction * 1f, 1f).SetEase(Ease.OutCubic);
+            cloudPart.DOMove(direction, 0.25f).SetRelative().SetEase(Ease.OutQuad);
             Renderer renderer = cloudPart.GetComponent<Renderer>();
             if (renderer != null)
             {
                 Material material = renderer.material;
-                material.DOFade(0f, 1f).OnComplete(()=>{ });
+                material.DOFade(0f, 0.25f).OnComplete(() => { });
             }
+            cloudPart.DOScale(0f, 0.25f).SetEase(Ease.OutQuad);
         }
         
     }
