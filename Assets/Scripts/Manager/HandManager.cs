@@ -9,12 +9,12 @@ public class HandManager : MonoBehaviour
 {
     [SerializeField] private int maxCardSize;
     [SerializeField] private GameObject spawnPoint;
-    [SerializeField] private SplineContainer splineContainer;
+    [SerializeField] private SplineContainer splineContainer, chooseCardSplineContainer;
     [SerializeField] private List<ActionCardSO> cardTypes;
-    [SerializeField] private GameObject hand;
+    [SerializeField] private GameObject hand, deck;
     private int cardInHandCapacity = 6;
-    private List<GameObject> cards = new();
-
+    private List<GameObject> handCards = new();
+    private List<GameObject> selectionCards = new();
     private void Start()
     {
         InitCardHand();
@@ -25,92 +25,163 @@ public class HandManager : MonoBehaviour
         {
             DrawCard();
         }
-        SortHandByType();
-
     }
-    private void SortHandByType()
+    private List<GameObject> SortCardByType(List<GameObject> listCards)
     {
-        cards = cards
+        if (listCards == null || listCards.Count == 0)
+            return new List<GameObject>();
+
+        List<GameObject> sortedList = listCards
             .OrderByDescending(c => c.GetComponent<ActionCard>().cardData.cardType)
             .ToList();
-        for (int i = 0; i < cards.Count; i++)
+
+        for (int i = 0; i < sortedList.Count; i++)
         {
-            cards[i].transform.SetSiblingIndex(cards.Count - 1 - i);
+            sortedList[i].transform.SetSiblingIndex(i);
         }
-        UpdateCardPosition();
+
+        return sortedList;
     }
 
     // 🔹 Generic draw (random or specific)
     public void DrawCard(GameObject cardPrefab = null)
     {
-        if (cards.Count >= maxCardSize) return;
-
+        if (handCards.Count >= cardInHandCapacity)
+        {
+            // Shake the hand if full
+            hand.GetComponent<RectTransform>().DOShakePosition(0.2f, new Vector3(15f, 0f, 0f), 15, 90, false, true);
+            return;
+        }
         int index = Random.Range(0, cardTypes.Count);
         GameObject prefab = cardPrefab ?? cardTypes[index].cardObject;
-
         GameObject cardSpawned = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, hand.transform);
-
         ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
         if (actionCard != null)
         {
             actionCard.Init(cardTypes[index], this); // pass self as manager
         }
-
-        cards.Add(cardSpawned);
-        SortHandByType();
+        handCards.Add(cardSpawned);
+        handCards = SortCardByType(handCards);
+        UpdateCardPosition(handCards, splineContainer.Spline);
     }
 
-    public void RemoveCard(GameObject card)
+    private void UpdateCardPosition(List<GameObject> list = null, Spline spline = null)
     {
-        if (cards.Contains(card))
+        if (list.Count == 0) return;
+        float cardSpacing;
+        if (spline == splineContainer.Spline)
+            cardSpacing = 0.5f / maxCardSize;
+        else if (spline == chooseCardSplineContainer.Spline)
+            cardSpacing = 1f / maxCardSize;
+        else
+            cardSpacing = 0.5f;
+
+        float firstPosition = 0.5f - (list.Count - 1) * cardSpacing / 2;
+        for (int i = 0; i < list.Count; i++)
         {
-            cards.Remove(card);
-            UpdateCardPosition();
-        }
-    }
+            RectTransform rect = list[i].GetComponent<RectTransform>();
+            ActionCard card = list[i].GetComponent<ActionCard>();
+            if (rect == null || card == null) continue;
 
-    private void UpdateCardPosition()
-    {
-        if (cards.Count == 0) return;
-
-        float cardSpacing = 0.5f / maxCardSize;
-        float firstPosition = 0.5f - (cards.Count - 1) * cardSpacing / 2;
-
-        Spline spline = splineContainer.Spline;
-
-        for (int i = 0; i < cards.Count; i++)
-        {
             float currentPos = firstPosition + i * cardSpacing;
             Vector3 worldPos = spline.EvaluatePosition(currentPos);
             Vector3 forward = spline.EvaluateTangent(currentPos);
-
             float angle = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
 
-            RectTransform rect = cards[i].GetComponent<RectTransform>();
-            ActionCard card = cards[i].GetComponent<ActionCard>();
-
-            rect.DOMove(worldPos, 1f).OnComplete(() =>
+            // Make a separate sequence per card
+            Sequence seq = DOTween.Sequence();
+            seq.Join(rect.DOMove(worldPos, 0.3f));
+            seq.Join(rect.DORotate(new Vector3(0, 0, angle - 180f), 0.3f));
+            seq.OnComplete(() =>
             {
-                card.SetBasePosition(rect.localPosition);
+                if (card != null && rect != null)
+                {
+                    card.SetBasePosition(rect.localPosition);
+                    card.EnableInteraction();
+                }
             });
-
-            rect.DORotate(new Vector3(0, 0, angle - 180f), 1f);
         }
+    }
+
+    private void ShowSelectedDeck(GameObject cardPrefab = null)
+    {
+        // Destroy previous selection cards
+        foreach (var card in selectionCards)
+        {
+            card.GetComponent<RectTransform>()?.DOKill();
+            Destroy(card);
+        }
+        selectionCards.Clear();
+
+        // Spawn new selection cards
+        for (int i = 0; i < 3; i++)
+        {
+            int index = Random.Range(0, cardTypes.Count);
+            GameObject prefab = cardPrefab ?? cardTypes[index].cardObject;
+            GameObject cardSpawned = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, deck.transform);
+            ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
+            if (actionCard != null)
+            {
+                actionCard.Init(cardTypes[index], this);
+            }
+            selectionCards.Add(cardSpawned);
+        }
+
+        selectionCards = SortCardByType(selectionCards);
+        UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
+    }
+    public void RemoveCard(GameObject card)
+    {
+        if (card == null) return;
+        // Remove from any list it belongs to
+        if (handCards.Contains(card))
+            handCards.Remove(card);
+        if (selectionCards.Contains(card))
+            selectionCards.Remove(card);
+
+        // Kill any running tweens and destroy
+        card.GetComponent<RectTransform>()?.DOKill();
+        Destroy(card);
+        // Recalculate positions
+        UpdateCardPosition(handCards, splineContainer.Spline);
+        UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
+        
+        // if (isHandCard)
+        // {
+        //     handCards.Remove(card);
+        //     card.GetComponent<RectTransform>()?.DOKill();
+        //     Destroy(card);
+        //     UpdateCardPosition(handCards, splineContainer.Spline);
+        // }
+        // if (!isHandCard)
+        // {
+        //     selectionCards.Remove(card);
+        //     card.GetComponent<RectTransform>()?.DOKill(); // stop tweens
+        //     Destroy(card);
+        //     UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
+        // }
+
     }
 
     private void Update()
     {
         if (Keyboard.current.enterKey.wasPressedThisFrame)
         {
-            DrawCard(); // random draw
+            DrawCard();
+        }
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            ShowSelectedDeck();
         }
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {
-            foreach (var card in cards)
+            foreach (var card in handCards)
             {
+                var rect = card.GetComponent<RectTransform>();
+                if (rect != null) rect.DOKill(); // stop any running tweens
                 Destroy(card);
             }
-            cards.Clear();
+            handCards.Clear();
         }
     }
 }
