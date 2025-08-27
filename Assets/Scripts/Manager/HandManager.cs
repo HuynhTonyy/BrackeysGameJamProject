@@ -3,6 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Splines;
+using System.Linq;
 
 public class HandManager : MonoBehaviour
 {
@@ -11,52 +12,97 @@ public class HandManager : MonoBehaviour
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private List<ActionCardSO> cardTypes;
     [SerializeField] private GameObject hand;
+    private int cardInHandCapacity = 6;
     private List<GameObject> cards = new();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void UpdateCardPosition()
+    private void Start()
+    {
+        InitCardHand();
+    }
+    private void InitCardHand()
+    {
+        for (int i = 0; i < cardInHandCapacity; i++)
+        {
+            DrawCard();
+        }
+        SortHandByType();
+
+    }
+    private void SortHandByType()
+    {
+        cards = cards
+            .OrderByDescending(c => c.GetComponent<ActionCard>().cardData.cardType)
+            .ToList();
+        for (int i = 0; i < cards.Count; i++)
+        {
+            cards[i].transform.SetSiblingIndex(cards.Count - 1 - i);
+        }
+        UpdateCardPosition();
+    }
+
+    // 🔹 Generic draw (random or specific)
+    public void DrawCard(GameObject cardPrefab = null)
+    {
+        if (cards.Count >= maxCardSize) return;
+
+        int index = Random.Range(0, cardTypes.Count);
+        GameObject prefab = cardPrefab ?? cardTypes[index].cardObject;
+
+        GameObject cardSpawned = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity, hand.transform);
+
+        ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
+        if (actionCard != null)
+        {
+            actionCard.Init(cardTypes[index], this); // pass self as manager
+        }
+
+        cards.Add(cardSpawned);
+        SortHandByType();
+    }
+
+    public void RemoveCard(GameObject card)
+    {
+        if (cards.Contains(card))
+        {
+            cards.Remove(card);
+            UpdateCardPosition();
+        }
+    }
+
+    private void UpdateCardPosition()
     {
         if (cards.Count == 0) return;
-        float cardSpacing = 1f / maxCardSize;
+
+        float cardSpacing = 0.5f / maxCardSize;
         float firstPosition = 0.5f - (cards.Count - 1) * cardSpacing / 2;
+
         Spline spline = splineContainer.Spline;
+
         for (int i = 0; i < cards.Count; i++)
         {
             float currentPos = firstPosition + i * cardSpacing;
             Vector3 worldPos = spline.EvaluatePosition(currentPos);
-            Debug.Log(worldPos);    
-
             Vector3 forward = spline.EvaluateTangent(currentPos);
+
             float angle = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-            cards[i].GetComponent<RectTransform>()
-    .DOMove(worldPos, 1f);
-            cards[i].GetComponent<RectTransform>()
-    .DORotate(new Vector3(0, 0, angle-180f),1f);
 
-        }           
-    }
+            RectTransform rect = cards[i].GetComponent<RectTransform>();
+            ActionCard card = cards[i].GetComponent<ActionCard>();
 
-    // Update is called once per frame
-    void DrawCard(GameObject card = null)
-    {
-        if (cards.Count >= maxCardSize) return;
-        int index = Random.Range(0, cardTypes.Count);
-        GameObject cardSpawned = Instantiate(card==null?cardTypes[index].cardObject:card, spawnPoint.transform.position, Quaternion.identity,hand.transform);
-        cards.Add(cardSpawned);
-        UpdateCardPosition();
-    }
-    private void Start() {
-        for (int i = 0; i < maxCardSize/2; i++)
-        {
-            DrawCard(cardTypes[i].cardObject);
-            DrawCard(cardTypes[i].cardObject);
+            rect.DOMove(worldPos, 1f).OnComplete(() =>
+            {
+                card.SetBasePosition(rect.localPosition);
+            });
+
+            rect.DORotate(new Vector3(0, 0, angle - 180f), 1f);
         }
     }
+
     private void Update()
     {
         if (Keyboard.current.enterKey.wasPressedThisFrame)
         {
-            DrawCard();
+            DrawCard(); // random draw
         }
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {
