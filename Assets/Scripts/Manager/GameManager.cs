@@ -102,8 +102,6 @@ public class GameManager : MonoBehaviour
             }
             PlayerMove(1);
             GridAction();
-
-
         }
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {

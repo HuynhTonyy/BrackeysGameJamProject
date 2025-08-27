@@ -14,6 +14,7 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private Image borderCard;
     private bool isHovered;
     private bool isPlayed = false;
+    private bool interactable = false;
     private Button button;
     private RectTransform rectTransform;
     private Vector3 baseLocalPos, originalScale;
@@ -29,6 +30,10 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             button.onClick.AddListener(OnCardClickToPlay);
         }
+    }
+    public void EnableInteraction()
+    {
+        interactable = true;
     }
 
     public void Init(ActionCardSO data, HandManager manager)
@@ -63,37 +68,36 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isHovered) return;
+        if (isHovered || !interactable) return;
         isHovered = true;
-
         rectTransform.DOLocalMove(baseLocalPos + new Vector3(0, 100f, 0), 0.2f).SetEase(Ease.OutQuad);
         rectTransform.DOScale(originalScale * 1f, 0.2f);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!isHovered) return;
+        if (!isHovered || !interactable) return;
         isHovered = false;
-
         rectTransform.DOLocalMove(baseLocalPos, 0.2f).SetEase(Ease.OutQuad);
         rectTransform.DOScale(originalScale, 0.2f);
     }
 
     public void OnCardClickToPlay()
     {
-        if (isPlayed) return;
+        if (isPlayed || !interactable) return;
         isPlayed = true;
-
-        rectTransform.DOLocalMove(new Vector3(baseLocalPos.x, baseLocalPos.y + 500f, baseLocalPos.z), 0.3f)
-    .SetEase(Ease.InQuad)
-    .OnComplete(() =>
-    {
-        handManager.RemoveCard(this.gameObject);
-        rectTransform.DOKill();
-        Destroy(gameObject);
-    });
-
-        rectTransform.DOScale(1.2f, 0.2f)
-            .OnComplete(() => rectTransform.DOScale(0.8f, 0.2f));
+        interactable = false;
+        isHovered = false;
+        Sequence seq = DOTween.Sequence();
+        seq.Append(rectTransform.DOLocalMove(
+            new Vector3(baseLocalPos.x, baseLocalPos.y + 300f, baseLocalPos.z),
+            0.2f
+        ).SetEase(Ease.InQuad));
+        seq.Append(rectTransform.DOScale(1.2f, 0.2f));
+        seq.Append(rectTransform.DOScale(0.8f, 0.2f));
+        seq.OnComplete(() =>
+        {
+            handManager.RemoveCard(this.gameObject);
+        });
     }
 }
