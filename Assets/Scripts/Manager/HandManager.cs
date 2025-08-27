@@ -70,7 +70,7 @@ public class HandManager : MonoBehaviour
         if (list.Count == 0) return;
         float cardSpacing;
         if (spline == splineContainer.Spline)
-            cardSpacing = 0.5f / maxCardSize;
+            cardSpacing = 1f / maxCardSize;
         else if (spline == chooseCardSplineContainer.Spline)
             cardSpacing = 1f / maxCardSize;
         else
@@ -87,10 +87,9 @@ public class HandManager : MonoBehaviour
             Vector3 worldPos = spline.EvaluatePosition(currentPos);
             Vector3 forward = spline.EvaluateTangent(currentPos);
             float angle = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
-
             // Make a separate sequence per card
             Sequence seq = DOTween.Sequence();
-            seq.Join(rect.DOMove(worldPos, 0.3f));
+            seq.Join(rect.DOLocalMove(worldPos, 0.3f));
             seq.Join(rect.DORotate(new Vector3(0, 0, angle - 180f), 0.3f));
             seq.OnComplete(() =>
             {
