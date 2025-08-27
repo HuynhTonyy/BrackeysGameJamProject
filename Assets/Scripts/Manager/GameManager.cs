@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && turnRemain > 0)
         {
             int moveStep = Random.Range(1, 4);
-            Debug.Log("Move step: " + moveStep);
+            // Debug.Log("Move step: " + moveStep);
             currentGrid += moveStep;
             if (currentGrid >= gridNum)
             {
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
         else
         {
             GridSO.GridType currentGridType = grids[currentGrid].Item1.gridType;
-            Debug.Log("Current grid type: " + currentGridType);
+            // Debug.Log("Current grid type: " + currentGridType);
             switch (currentGridType)
             {
                 case GridSO.GridType.Empty:

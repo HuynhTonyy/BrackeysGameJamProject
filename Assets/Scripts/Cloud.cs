@@ -23,7 +23,7 @@ public class Cloud : MonoBehaviour
             //get the direction 
             Vector3 centerPoint = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
             Vector3 direction = (cloudPart.position - centerPoint).normalized;
-            Debug.Log(direction);
+            // Debug.Log(direction);
             cloudPart.DOMove(direction, 0.25f).SetRelative().SetEase(Ease.OutQuad);
             Renderer renderer = cloudPart.GetComponent<Renderer>();
             if (renderer != null)
