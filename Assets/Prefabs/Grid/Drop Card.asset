@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Drop Card
   m_EditorClassIdentifier: 
   gridType: 4
-  gameObject: {fileID: 3694253023650902653, guid: 18ae5e86f462f434487559648950c5ce, type: 3}
+  gameObject: {fileID: 5570293744794415227, guid: 0c4b3a4df84975446a3a0965f25e7837, type: 3}
