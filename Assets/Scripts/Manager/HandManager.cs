@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 using System.Linq;
 
+
 public class HandManager : MonoBehaviour
 {
     [SerializeField] private int maxCardSize;
@@ -12,16 +13,138 @@ public class HandManager : MonoBehaviour
     [SerializeField] private SplineContainer splineContainer, chooseCardSplineContainer;
     [SerializeField] private List<ActionCardSO> cardTypes;
     [SerializeField] private GameObject hand, deck;
-    private int cardInHandCapacity = 6;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
+    [SerializeField] public HandState currentHandState;
+    [SerializeField] public DeckState currentDeckState;
+    private Vector3 baseHandPos;
+    private float hideOffsetY = -300f;
+    public enum DeckState
+    {
+        waiting,
+        selecting,
+        hiding
+    }
+    public enum HandState
+    {
+        waiting,
+        selecting,
+        discarding,
+        hiding
+    }
+
+    public void ChangeDeckState(DeckState newDeckState)
+    {
+        currentDeckState = newDeckState;
+        // 🔹 Handle Deck State
+        switch (currentDeckState)
+        {
+            case DeckState.selecting:
+                SetDeckPlayble(true);
+                break;
+
+            case DeckState.waiting:
+                // maybe show empty deck or idle
+                ShowSelectedDeck();
+                SetDeckPlayble(false);
+                ChangeHandState(HandState.discarding);
+                break;
+
+            case DeckState.hiding:
+                HideSelectedDeck();
+                break;
+        }
+    }
+    public void ChangeHandState(HandState newHandState)
+    {
+        currentHandState = newHandState;
+        switch (currentHandState)
+        {
+            case HandState.waiting:
+                SetHandPlayble(false);
+                HideHand(false);
+                break;
+
+            case HandState.selecting:
+                SetHandPlayble(true);
+                HideHand(false);
+                break;
+
+            case HandState.hiding:
+                SetHandPlayble(false);
+                HideHand(true);
+                break;
+
+            case HandState.discarding:
+                SetHandPlayble(true);
+                HideHand(false);
+                break;
+        }
+    }
+
+    private void HideSelectedDeck()
+    {
+        foreach (var card in selectionCards)
+        {
+            Destroy(card);
+        }
+        selectionCards.Clear();
+    }
+
+    private void SetHandPlayble(bool enable)
+    {
+        foreach (var card in handCards)
+        {
+            var actionCard = card.GetComponent<ActionCard>();
+            if (actionCard != null)
+            {
+                if (enable) actionCard.EnablePlay(true);
+                else actionCard.EnablePlay(false);
+            }
+        }
+    }
+    private void SetDeckPlayble(bool enable)
+    {
+        foreach (var card in selectionCards)
+        {
+            var actionCard = card.GetComponent<ActionCard>();
+            if (actionCard != null)
+            {
+                if (enable) actionCard.EnablePlay(true);
+                else actionCard.EnablePlay(false);
+            }
+        }
+    }
+    private void HideHand(bool hide)
+    {
+        if (currentHandState == HandState.hiding && hide == false)
+        {
+            currentHandState = HandState.selecting;
+        }
+        RectTransform rect = hand.GetComponent<RectTransform>();
+        baseHandPos = hand.GetComponent<RectTransform>().localPosition;
+        if (rect == null) return;
+        rect.DOKill(); // stop old tween
+        if (hide)
+        {
+            rect.DOLocalMoveY(baseHandPos.y + hideOffsetY, 0.5f).SetEase(Ease.InCubic);
+        }
+        else
+        {
+            rect.DOLocalMoveY(baseHandPos.y - hideOffsetY, 0.5f).SetEase(Ease.OutCubic);
+        }
+    }
+
     private void Start()
     {
         InitCardHand();
+        ChangeDeckState(DeckState.hiding);
+        ChangeHandState(HandState.selecting);
+
     }
     private void InitCardHand()
     {
-        for (int i = 0; i < cardInHandCapacity; i++)
+        for (int i = 0; i < maxCardSize; i++)
         {
             DrawCard();
         }
@@ -42,11 +165,10 @@ public class HandManager : MonoBehaviour
 
         return sortedList;
     }
-
     // 🔹 Generic draw (random or specific)
     public void DrawCard(GameObject cardPrefab = null)
     {
-        if (handCards.Count >= cardInHandCapacity)
+        if (handCards.Count >= maxCardSize)
         {
             // Shake the hand if full
             hand.GetComponent<RectTransform>().DOShakePosition(0.2f, new Vector3(15f, 0f, 0f), 15, 90, false, true);
@@ -64,7 +186,6 @@ public class HandManager : MonoBehaviour
         handCards = SortCardByType(handCards);
         UpdateCardPosition(handCards, splineContainer.Spline);
     }
-
     private void UpdateCardPosition(List<GameObject> list = null, Spline spline = null)
     {
         if (list.Count == 0) return;
@@ -72,7 +193,7 @@ public class HandManager : MonoBehaviour
         if (spline == splineContainer.Spline)
             cardSpacing = 1f / maxCardSize;
         else if (spline == chooseCardSplineContainer.Spline)
-            cardSpacing = 1f / maxCardSize;
+            cardSpacing = 0.4f;
         else
             cardSpacing = 0.5f;
 
@@ -96,15 +217,16 @@ public class HandManager : MonoBehaviour
                 if (card != null && rect != null)
                 {
                     card.SetBasePosition(rect.localPosition);
-                    card.EnableInteraction();
+                    card.EnableInteraction(true);
                 }
             });
         }
     }
-
     private void ShowSelectedDeck(GameObject cardPrefab = null)
     {
         // Destroy previous selection cards
+        if (currentDeckState == DeckState.hiding) return;
+
         foreach (var card in selectionCards)
         {
             card.GetComponent<RectTransform>()?.DOKill();
@@ -122,6 +244,10 @@ public class HandManager : MonoBehaviour
             if (actionCard != null)
             {
                 actionCard.Init(cardTypes[index], this);
+                if (currentDeckState == DeckState.waiting)
+                    actionCard.EnablePlay(false);
+                else
+                    actionCard.EnablePlay(true);
             }
             selectionCards.Add(cardSpawned);
         }
@@ -144,24 +270,8 @@ public class HandManager : MonoBehaviour
         // Recalculate positions
         UpdateCardPosition(handCards, splineContainer.Spline);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
-        
-        // if (isHandCard)
-        // {
-        //     handCards.Remove(card);
-        //     card.GetComponent<RectTransform>()?.DOKill();
-        //     Destroy(card);
-        //     UpdateCardPosition(handCards, splineContainer.Spline);
-        // }
-        // if (!isHandCard)
-        // {
-        //     selectionCards.Remove(card);
-        //     card.GetComponent<RectTransform>()?.DOKill(); // stop tweens
-        //     Destroy(card);
-        //     UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
-        // }
 
     }
-
     private void Update()
     {
         if (Keyboard.current.enterKey.wasPressedThisFrame)
@@ -170,17 +280,28 @@ public class HandManager : MonoBehaviour
         }
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            ShowSelectedDeck();
-        }
-        if (Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            foreach (var card in handCards)
+            if (currentDeckState != DeckState.hiding)
             {
-                var rect = card.GetComponent<RectTransform>();
-                if (rect != null) rect.DOKill(); // stop any running tweens
-                Destroy(card);
+                ChangeDeckState(DeckState.hiding);
+                ChangeHandState(HandState.selecting);
             }
-            handCards.Clear();
+            else
+            {
+                ChangeDeckState(DeckState.waiting);
+                ChangeHandState(HandState.selecting);
+            }
+        }
+        if (Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            if (currentHandState != HandState.hiding)
+            {
+                ChangeHandState(HandState.hiding);
+            }
+            else
+            {
+                ChangeHandState(HandState.selecting);
+            }
+
         }
     }
 }

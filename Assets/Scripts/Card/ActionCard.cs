@@ -13,7 +13,7 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private HandManager handManager;
     private Image borderCard;
     private bool isHovered;
-    private bool isPlayed = false;
+    [SerializeField] private bool isPlayed = false;
     private bool interactable = false;
     private Button button;
     private RectTransform rectTransform;
@@ -31,11 +31,15 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             button.onClick.AddListener(OnCardClickToPlay);
         }
     }
-    public void EnableInteraction()
+    public void EnableInteraction(bool enable)
     {
-        interactable = true;
+        interactable = enable;
     }
+    public void EnablePlay(bool enable)
+    {
 
+        isPlayed = enable;
+    }
     public void Init(ActionCardSO data, HandManager manager)
     {
         cardData = data;
@@ -84,9 +88,9 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnCardClickToPlay()
     {
-        if (isPlayed || !interactable) return;
-        isPlayed = true;
-        interactable = false;
+        if (!isPlayed || !interactable) return;
+        EnablePlay(true);
+        EnableInteraction(false);
         isHovered = false;
         Sequence seq = DOTween.Sequence();
         seq.Append(rectTransform.DOLocalMove(
