@@ -35,9 +35,6 @@ public class GameManager : MonoBehaviour
         gridText.SetText("Current grid: " + currentGrid);
         player.SetActive(true);
         InitGrid();
-        // InitGridPosition(0);
-        // InitGridPosition(1);
-        // InitGridPosition(2);
     }
     void InitGrid()
     {
@@ -45,7 +42,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < gridNum; i++)
         {
             Vector3 gridPos = InitGridPosition(i);
-            Debug.Log("Grid " + i + " position: " + gridPos );
             int randomIndex = Random.Range(0, gridTypes.Count);
             if (i == 0)
             {
@@ -198,7 +194,6 @@ public class GameManager : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && turnRemain > 0)
         {
             int moveStep = Random.Range(1, 4);
-            Debug.Log("Move step: " + moveStep);
             currentGrid += moveStep;
             if (currentGrid >= gridNum)
             {
@@ -206,8 +201,6 @@ public class GameManager : MonoBehaviour
             }
             PlayerMove(1);
             GridAction();
-
-
         }
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {
@@ -272,7 +265,6 @@ public class GameManager : MonoBehaviour
         else
         {
             GridSO.GridType currentGridType = grids[currentGrid].Item1.gridType;
-            Debug.Log("Current grid type: " + currentGridType);
             switch (currentGridType)
             {
                 case GridSO.GridType.Empty:
