@@ -15,6 +15,15 @@ public class HandManager : MonoBehaviour
     [SerializeField] private GameObject hand, deck;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
+    public List<GameObject> CurrentCard()
+    {
+        return handCards;
+    }
+    public void DropRandomCard()
+    {
+        GameObject randomCard = handCards[Random.Range(0, handCards.Count)];
+        RemoveCard(randomCard);
+    }
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;
     private Vector3 baseHandPos;
@@ -259,14 +268,14 @@ public class HandManager : MonoBehaviour
     {
         if (card == null) return;
         // Remove from any list it belongs to
-        if (handCards.Contains(card))
-            handCards.Remove(card);
-        if (selectionCards.Contains(card))
-            selectionCards.Remove(card);
 
         // Kill any running tweens and destroy
         card.GetComponent<RectTransform>()?.DOKill();
         Destroy(card);
+        if (handCards.Contains(card))
+            handCards.Remove(card);
+        if (selectionCards.Contains(card))
+            selectionCards.Remove(card);
         // Recalculate positions
         UpdateCardPosition(handCards, splineContainer.Spline);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);

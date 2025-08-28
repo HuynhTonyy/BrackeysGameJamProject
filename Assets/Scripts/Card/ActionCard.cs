@@ -103,5 +103,10 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             handManager.RemoveCard(this.gameObject);
         });
+        GameManager.Instance.MovePlayer(cardData.step, 1);
+        if (handManager.CurrentCard().Count <= 0)
+        {
+            handManager.DrawCard();
+        }
     }
 }
