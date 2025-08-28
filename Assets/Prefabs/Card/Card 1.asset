@@ -16,3 +16,4 @@ MonoBehaviour:
   cardDescription: Player can move 1 tile forward,
   cardType: 0
   cardObject: {fileID: 2181425988099683369, guid: 691544fb240f45142a3f1701ffe243d1, type: 3}
+  step: 1

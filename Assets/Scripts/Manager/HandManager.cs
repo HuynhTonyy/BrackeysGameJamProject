@@ -15,6 +15,15 @@ public class HandManager : MonoBehaviour
     private int cardInHandCapacity = 6;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
+    public List<GameObject> CurrentCard()
+    {
+        return handCards;
+    }
+    public void DropRandomCard()
+    {
+        GameObject randomCard = handCards[Random.Range(0, handCards.Count)];
+        RemoveCard(randomCard);
+    }
     private void Start()
     {
         InitCardHand();
@@ -133,14 +142,14 @@ public class HandManager : MonoBehaviour
     {
         if (card == null) return;
         // Remove from any list it belongs to
-        if (handCards.Contains(card))
-            handCards.Remove(card);
-        if (selectionCards.Contains(card))
-            selectionCards.Remove(card);
 
         // Kill any running tweens and destroy
         card.GetComponent<RectTransform>()?.DOKill();
         Destroy(card);
+        if (handCards.Contains(card))
+            handCards.Remove(card);
+        if (selectionCards.Contains(card))
+            selectionCards.Remove(card);
         // Recalculate positions
         UpdateCardPosition(handCards, splineContainer.Spline);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
@@ -171,16 +180,6 @@ public class HandManager : MonoBehaviour
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             ShowSelectedDeck();
-        }
-        if (Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            foreach (var card in handCards)
-            {
-                var rect = card.GetComponent<RectTransform>();
-                if (rect != null) rect.DOKill(); // stop any running tweens
-                Destroy(card);
-            }
-            handCards.Clear();
         }
     }
 }

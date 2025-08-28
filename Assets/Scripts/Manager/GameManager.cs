@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using DG.Tweening;
+using UnityEditor.PackageManager;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject player;
@@ -16,20 +17,45 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<GridSO> gridTypes;
     [SerializeField] int gridPerRow;
     int currentGrid = 0;
-    List<(GridSO,GameObject)> grids = new List<(GridSO,GameObject)>();
+    List<(GridSO, GameObject,bool)> grids = new List<(GridSO, GameObject,bool)>();
     [SerializeField] int maxTurn;
     [SerializeField] TMP_Text turnText;
     [SerializeField] TMP_Text gridText;
     [SerializeField] int vision = 3;
     int turnRemain;
-
     [SerializeField] private float pathLength;
     [SerializeField] private float borderLimit;
     [SerializeField] private int minPerDir;
     [SerializeField] private GameObject pathObj;
+    private List<GameObject> paths = new List<GameObject>();
+    [SerializeField] private int turnUntilSink;
+    [SerializeField] private int sinkNum;
+    [SerializeField] private HandManager handManager;
+    private int sinkedGridIndex = 0;
+    [SerializeField] private GameObject endPanel;
+    public static GameManager Instance { get; private set; }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private GameManager()
+    {
+
+    }
+    void Awake()
+    {
+        // Check if instance already exists
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // Prevent duplicates
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject); // Persist across scenes
+    }
     void Start()
     {
+
+        endPanel.SetActive(false);
         turnRemain = maxTurn;
         turnText.SetText("Turn remain: " + turnRemain);
         gridText.SetText("Current grid: " + currentGrid);
@@ -46,25 +72,25 @@ public class GameManager : MonoBehaviour
             if (i == 0)
             {
                 GameObject gridObj = Instantiate(startGrid.gameObject, gridPos, Quaternion.identity);
-                grids.Add((startGrid, gridObj));
+                grids.Add((startGrid, gridObj,true));
             }
             else if (i == gridNum - 1)
             {
                 GameObject gridObj = Instantiate(endGrid.gameObject, gridPos, Quaternion.identity);
-                grids.Add((endGrid, gridObj));
+                grids.Add((endGrid, gridObj,true));
             }
             else
             {
                 if (previousGridTypeIndex == randomIndex)
                 {
                     GameObject gridObj = Instantiate(emptyGrid.gameObject, gridPos, Quaternion.identity);
-                    grids.Add((emptyGrid, gridObj));
+                    grids.Add((emptyGrid, gridObj,true));
                     previousGridTypeIndex = -1;
                 }
                 else
                 {
                     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, gridPos, Quaternion.identity);
-                    grids.Add((gridTypes[randomIndex], gridObj));
+                    grids.Add((gridTypes[randomIndex], gridObj,true));
                     previousGridTypeIndex = randomIndex;
 
                 }
@@ -86,32 +112,21 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < gridNum - 1; i++)
         {
-            Vector3 pathPos = grids[i].Item2.transform.position + (grids[i + 1].Item2.transform.position - grids[i].Item2.transform.position)*0.5f;
+            Vector3 pathPos = grids[i].Item2.transform.position + (grids[i + 1].Item2.transform.position - grids[i].Item2.transform.position) * 0.5f;
 
             GameObject newPathObj = Instantiate(pathObj, pathPos, Quaternion.identity);
+            paths.Add(newPathObj);
             Vector3 distance = grids[i + 1].Item2.transform.position - grids[i].Item2.transform.position;
             float angle = Mathf.Atan2(distance.y, distance.x) * Mathf.Rad2Deg;
             newPathObj.transform.DORotate(new Vector3(0, 0, angle), 0.25f);
         }
     }
-    Vector3 GetGridPosition(int i)
-    {
-        
-        int row = i / gridPerRow;
-        int collum = i % gridPerRow;
-        if (row % 2 == 1)
-        {
-            collum = gridPerRow - collum - 1;
-        }
-        Vector3 gridPos = new Vector3(collum, row, 0);
-        return gridPos;
-    }
     bool CheckReachMinPerDir(int index)
     {
-        if(index <= minPerDir) return false;
+        if (index <= minPerDir) return false;
         int numSameDir = 2;
         Vector3 lastestDir = (grids[index - 1].Item2.transform.position - grids[index - 2].Item2.transform.position).normalized;
-        for (int i = 0; i < minPerDir-1; i++)
+        for (int i = 0; i < minPerDir - 1; i++)
         {
             Vector3 thisDir = (grids[grids.Count - 2 - i].Item2.transform.position - grids[grids.Count - 3 - i].Item2.transform.position).normalized;
             if (lastestDir == thisDir)
@@ -194,29 +209,40 @@ public class GameManager : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && turnRemain > 0)
         {
             int moveStep = Random.Range(1, 4);
-            currentGrid += moveStep;
-            if (currentGrid >= gridNum)
-            {
-                currentGrid = gridNum - 1;
-            }
-            PlayerMove(1);
-            GridAction();
+            MovePlayer(moveStep, 1);
         }
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
-    void PlayerMove(int turnUsed)
+    public void MovePlayer(int step, int turnUsed)
     {
+        currentGrid += step;
+        if (currentGrid >= gridNum)
+        {
+            currentGrid = gridNum - 1;
+        }
+        if (currentGrid <= sinkedGridIndex)
+        {
+            Debug.Log("Da bi pha");
+            endPanel.SetActive(true);
+            // return;
+        }
         player.transform.position = grids[currentGrid].Item2.transform.position;
-        turnRemain -= turnUsed;
-        turnText.SetText("Turn remain: " + turnRemain);
+        if (turnUsed > 0)
+        {
+            turnRemain -= turnUsed;
+            turnText.SetText("Turn remain: " + turnRemain);
+            Sink();
+        }
         gridText.SetText("Current grid: " + currentGrid);
         CheckClouds();
+        GridAction();
     }
     void CheckClouds()
     {
+        if (currentGrid == 0) return;
         for (int i = 0; i <= vision; i++)
         {
             int cloudIndex = currentGrid - 1 + i;
@@ -229,7 +255,7 @@ public class GameManager : MonoBehaviour
             {
                 break;
             }
-            
+
         }
         // for (int i = 0; i < clouds.Count; i++)
         // {
@@ -241,118 +267,135 @@ public class GameManager : MonoBehaviour
         //     {
         //         clouds[i].SetActive(true);
         //     }
-            // if (i < currentGrid - 1)
-            // {
-            //     int randomIndex = Random.Range(0, gridTypes.Count);
-            //     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
-            //     Destroy(grids[i + 1].Item2);    
-            //     grids[i + 1] =(gridTypes[randomIndex], gridObj);
-            // }
+        // if (i < currentGrid - 1)
+        // {
+        //     int randomIndex = Random.Range(0, gridTypes.Count);
+        //     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
+        //     Destroy(grids[i + 1].Item2);    
+        //     grids[i + 1] =(gridTypes[randomIndex], gridObj);
+        // }
         // }
     }
     void GridAction()
     {
+        
         if (currentGrid == gridNum - 1)
         {
-            turnText.SetText("You Win! Press R to restart");
-            player.SetActive(false);
+                    endPanel.SetActive(true);
+
         }
-        else if (turnRemain == 0)
+        else if (turnRemain == 0 || currentGrid <= sinkedGridIndex)
         {
-            turnText.SetText("You Lose! Press R to restart");
-            player.SetActive(false);
+                    endPanel.SetActive(true);
+
         }
         else
         {
+            if (!grids[currentGrid].Item3) return;
             GridSO.GridType currentGridType = grids[currentGrid].Item1.gridType;
             switch (currentGridType)
             {
                 case GridSO.GridType.Empty:
                     break;
                 case GridSO.GridType.MoveForward:
-                    StartCoroutine(MoveForwardCoroutine());
+                    StartCoroutine(MoveCoroutine(1));
                     break;
                 case GridSO.GridType.MoveBackward:
-                    StartCoroutine(MoveBackwardCoroutine());
+                    StartCoroutine(MoveCoroutine(-1));
                     break;
                 case GridSO.GridType.AddCard:
+                    handManager.DrawCard();
                     break;
                 case GridSO.GridType.DropCard:
+                    handManager.DropRandomCard();
                     break;
                 case GridSO.GridType.IceLake:
                     turnRemain--;
                     turnText.SetText("Turn remain: " + turnRemain);
                     if (turnRemain == 0)
                     {
-                        turnText.SetText("You Lose! Press R to restart");
-                        player.SetActive(false);
+                                endPanel.SetActive(true);
+
                     }
                     break;
                 case GridSO.GridType.Scout:
                     break;
                 case GridSO.GridType.Swamp:
-                    if (turnRemain > 1)
+                    if (turnRemain > 2)
                     {
                         turnRemain -= 2;
+                        turnText.SetText("Turn remain: " + turnRemain);
+
                     }
                     else
                     {
                         turnRemain = 0;
-                        turnText.SetText("You Lose! Press R to restart");
-                        player.SetActive(false);
+                                endPanel.SetActive(true);
+
                     }
-                    turnText.SetText("Turn remain: " + turnRemain);
                     break;
                 case GridSO.GridType.Teleport:
+                    Sink();
                     StartCoroutine(TeleportCoroutine());
                     break;
             }
+            grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
+            // if (visitedGridIndex != -1)
+            // {
+            //     GameObject gridObj = Instantiate(emptyGrid.gameObject, grids[visitedGridIndex].Item2.transform.position, Quaternion.identity);
+            // Destroy(grids[visitedGridIndex].Item2);    
+            // grids[visitedGridIndex] =(gridTypes[visitedGridIndex], gridObj,);
+            // }
+            // visitedGridIndex = currentGrid;
+            // Sink();
+
         }
     }
-    IEnumerator MoveForwardCoroutine()
+    void Sink()
     {
-        yield return new WaitForSeconds(1f);
-        currentGrid += 1;
-        PlayerMove(0);
-        GridAction();
+        if (maxTurn - turnRemain < turnUntilSink) return;
+        int sinkToIndex = (maxTurn - turnRemain) / turnUntilSink * sinkNum;
+        for (int i = sinkToIndex - sinkNum; i < sinkToIndex; i++)
+        {
+            grids[i].Item2.SetActive(false);
+            paths[i].SetActive(false);
+        }
+        sinkedGridIndex = sinkToIndex-1;
     }
-    IEnumerator MoveBackwardCoroutine()
+    IEnumerator MoveCoroutine(int step)
     {
         yield return new WaitForSeconds(1f);
-        currentGrid -= 1;
-        PlayerMove(0);
+        MovePlayer(step,0);
         GridAction();
     }
     IEnumerator TeleportCoroutine()
     {
         yield return new WaitForSeconds(1f);
-        int min = 1;
-        if (currentGrid - 6 > 1)
+        int min = currentGrid - 6;
+        if (currentGrid - 6 <= sinkedGridIndex)
         {
-            min = currentGrid - 6;
+            min = currentGrid - sinkedGridIndex;
         }
         int max = gridNum - 2;
         if (currentGrid + 6 < gridNum - 2)
         {
             max = currentGrid + 6;
         }
-        int randomGrid = currentGrid;
-        bool found = true;
-        while (found)
+        int randomGrid;
+        while (true)
         {
             randomGrid = Random.Range(min, max + 1);
-            if (randomGrid != currentGrid || grids[randomGrid].Item1.gridType != GridSO.GridType.Teleport)
+            if (randomGrid != currentGrid && grids[randomGrid].Item1.gridType != GridSO.GridType.Teleport)
             {
-                found = false;
                 break;
             }
         }
-        currentGrid = randomGrid;
-        PlayerMove(0);
+        MovePlayer(randomGrid-currentGrid,0);
         GridAction();
     }
     void EndGame()
     {
         player.SetActive(false);
     }
+
 }

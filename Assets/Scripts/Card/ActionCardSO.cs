@@ -8,6 +8,7 @@ public class ActionCardSO : ScriptableObject
     public string cardDescription;
     public CardType cardType;
     public GameObject cardObject;
+    public int step;
 }
 
 public enum CardType
