@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Teleport
   m_EditorClassIdentifier: 
   gridType: 6
-  gameObject: {fileID: 7169529572088807791, guid: 5a48b639b6805634bbb977cc6806a199, type: 3}
+  gameObject: {fileID: 8711555571576654350, guid: 3a43d9d12a6f6604d88783ab289bd698, type: 3}
