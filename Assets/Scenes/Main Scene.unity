@@ -1286,7 +1286,7 @@ Transform:
   m_GameObject: {fileID: 1317741913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.18017, y: 4.42171, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1314,6 +1314,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f5a93e51d0099274884e4427e19bfd00, type: 2}
   hand: {fileID: 1322755015}
   deck: {fileID: 1299191885}
+  currentHandState: 0
+  currentDeckState: 0
 --- !u!1 &1322755015
 GameObject:
   m_ObjectHideFlags: 0
@@ -1346,7 +1348,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -70}
   m_SizeDelta: {x: 0, y: 150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &1562499474
