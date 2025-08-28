@@ -24,7 +24,6 @@ public class HandManager : MonoBehaviour
         {
             float currentPos = firstPosition + i * cardSpacing;
             Vector3 worldPos = spline.EvaluatePosition(currentPos);
-            Debug.Log(worldPos);    
 
             Vector3 forward = spline.EvaluateTangent(currentPos);
             float angle = Mathf.Atan2(forward.y, forward.x) * Mathf.Rad2Deg;
