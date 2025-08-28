@@ -1095,7 +1095,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 150}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1299191887
@@ -1378,6 +1378,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdadb7c44820d6144b6e016fd0959ee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  islandBases:
+  - {fileID: 8711555571576654350, guid: 3a43d9d12a6f6604d88783ab289bd698, type: 3}
+  - {fileID: 6951465810031443858, guid: 860cc999018cc7c4689a54b71c7691e5, type: 3}
+  - {fileID: 9014587535701927344, guid: 6b977d92297eaba4e9c2f8c57b2d3934, type: 3}
+  - {fileID: 7722418165885577335, guid: 7cfd4adc96464b94a98ce9ecef96c966, type: 3}
+  - {fileID: 7478738403476511244, guid: 3d1d49d326117434eab0f824c71c4409, type: 3}
   player: {fileID: 510417601}
   gridNum: 36
   startGrid: {fileID: 11400000, guid: bf29b2c655878074989f7dae4ecfe5e6, type: 2}
@@ -1398,10 +1404,10 @@ MonoBehaviour:
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
   vision: 2
-  pathLength: 2
+  pathLength: 4.5
   borderLimit: 20000
   minPerDir: 3
-  pathObj: {fileID: 2277868343873011255, guid: 4f81340dfd877bb449eeeec46d9c424c, type: 3}
+  pathObj: {fileID: 3811827240753092671, guid: e41daf36c8d87604687b4e35fd44b970, type: 3}
   turnUntilSink: 2
   sinkNum: 3
   handManager: {fileID: 1317741915}
@@ -1656,7 +1662,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1935152129690754035, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4034093360463539910, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_Sprite

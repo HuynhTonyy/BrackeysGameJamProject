@@ -7,6 +7,7 @@ using DG.Tweening;
 using UnityEditor.PackageManager;
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] List<GameObject> islandBases;
     [SerializeField] GameObject player;
     [SerializeField] int gridNum;
     [SerializeField] GridSO startGrid;
@@ -61,6 +62,7 @@ public class GameManager : MonoBehaviour
         gridText.SetText("Current grid: " + currentGrid);
         player.SetActive(true);
         InitGrid();
+
     }
     void InitGrid()
     {
@@ -68,6 +70,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < gridNum; i++)
         {
             Vector3 gridPos = InitGridPosition(i);
+            Debug.Log(i+"-"+gridPos);
             int randomIndex = Random.Range(0, gridTypes.Count);
             if (i == 0)
             {
@@ -84,12 +87,21 @@ public class GameManager : MonoBehaviour
                 if (previousGridTypeIndex == randomIndex)
                 {
                     GameObject gridObj = Instantiate(emptyGrid.gameObject, gridPos, Quaternion.identity);
+                    ;
+                    GameObject islandBaseObj = Instantiate(islandBases[Random.Range(0, islandBases.Count)], Vector3.zero, Quaternion.identity,gridObj.transform);
+                    islandBaseObj.transform.localPosition = Vector3.zero;
+                    islandBaseObj.transform.localRotation = Quaternion.identity;
+                    islandBaseObj.transform.localScale = Vector3.one;
                     grids.Add((emptyGrid, gridObj,true));
                     previousGridTypeIndex = -1;
                 }
                 else
                 {
                     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, gridPos, Quaternion.identity);
+                    GameObject islandBaseObj = Instantiate(islandBases[Random.Range(0, islandBases.Count)], Vector3.zero, Quaternion.identity,gridObj.transform);
+                    islandBaseObj.transform.localPosition = Vector3.zero;
+                    islandBaseObj.transform.localRotation = Quaternion.identity;
+                    islandBaseObj.transform.localScale = Vector3.one;
                     grids.Add((gridTypes[randomIndex], gridObj,true));
                     previousGridTypeIndex = randomIndex;
 
@@ -194,10 +206,14 @@ public class GameManager : MonoBehaviour
                     xAxis = Vector3.right;
                 }
                 direction = (xAxis + Vector3.up).normalized;
+                Debug.Log("can chang dir:" + direction);
             }
             else
             {
+
                 direction = (grids[index - 1].Item2.transform.position - grids[index - 2].Item2.transform.position).normalized;
+                Debug.Log(grids[index - 1].Item2.transform.position +"-"+ grids[index - 2].Item2.transform.position);
+                Debug.Log("same dir:" + direction);
             }
         }
         Vector3 gridPos = grids[index - 1].Item2.transform.position + direction * pathLength;
