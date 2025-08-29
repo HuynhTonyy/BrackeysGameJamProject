@@ -9,11 +9,17 @@ public class ActionCardSO : ScriptableObject
     public CardType cardType;
     public GameObject cardObject;
     public int step;
+    public TradeOffType tradeOffType;
+    public bool isTemporary;
+    public int duration = 1;
 }
 
 public enum CardType
 {
     Move,
-    Buff,
-    Debuff
+    TradeOff,
+}
+public enum TradeOffType
+{
+    Repeat,
 }

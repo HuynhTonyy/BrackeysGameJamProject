@@ -14,7 +14,7 @@ public class GridSO : ScriptableObject
         Teleport,
         Start,
         End,
-        IceLake,
+        CursedFrog,
         Scout,
     }
     public GridType gridType;

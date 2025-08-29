@@ -13,7 +13,7 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private HandManager handManager;
     private Image borderCard;
     private bool isHovered;
-    [SerializeField] private bool isPlayed = false;
+    [SerializeField] private bool isPlayed = true;
     private bool interactable = false;
     private Button button;
     private RectTransform rectTransform;
@@ -26,10 +26,10 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         originalScale = rectTransform.localScale;
         button = GetComponent<Button>();
         handManager = GetComponentInParent<HandManager>();
-        if (button != null)
-        {
-            button.onClick.AddListener(OnCardClickToPlay);
-        }
+        // if (button != null)
+        // {
+        //     button.onClick.AddListener(OnCardClickToPlay);
+        // }
     }
     public void EnableInteraction(bool enable)
     {
@@ -52,9 +52,8 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             switch (cardData.cardType)
             {
-                case CardType.Move: borderCard.color = Color.green; break;
-                case CardType.Buff: borderCard.color = Color.yellow; break;
-                case CardType.Debuff: borderCard.color = Color.red; break;
+                case CardType.Move: borderCard.color = Color.white; break;
+                case CardType.TradeOff: borderCard.color = Color.yellow; break;
                 default: borderCard.color = Color.white; break;
             }
         }
@@ -89,9 +88,14 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnCardClickToPlay()
     {
         if (!isPlayed || !interactable) return;
-        EnablePlay(true);
-        EnableInteraction(false);
+        isPlayed = false;
+        interactable = false;
         isHovered = false;
+        PlayCardAnimation();
+        EventManager.Instance.PlayCard(cardData);
+    }
+    void PlayCardAnimation()
+    {
         Sequence seq = DOTween.Sequence();
         seq.Append(rectTransform.DOLocalMove(
             new Vector3(baseLocalPos.x, baseLocalPos.y + 300f, baseLocalPos.z),
@@ -101,12 +105,8 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         seq.Append(rectTransform.DOScale(0.8f, 0.2f));
         seq.OnComplete(() =>
         {
-            handManager.RemoveCard(this.gameObject);
+            EventManager.Instance.CardPlayAnimationEnd(this.gameObject);
         });
-        GameManager.Instance.MovePlayer(cardData.step, 1);
-        if (handManager.CurrentCard().Count <= 0)
-        {
-            handManager.DrawCard();
-        }
     }
+    
 }

@@ -15,9 +15,53 @@ public class HandManager : MonoBehaviour
     [SerializeField] private GameObject hand, deck;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
-    public List<GameObject> CurrentCard()
+    private bool isRepeat { get; set; } = false;
+    private void OnEnable()
     {
-        return handCards;
+        EventManager.Instance.onCardPlayAnimationEnd += RemoveCard;
+        EventManager.Instance.onPlayCard += PlayCardAbility;
+        EventManager.Instance.onEnterAddCardGrid += DrawCard;
+        EventManager.Instance.onEnterDropCardGrid += DropRandomCard;
+    }
+    private void OnDisable()
+    {
+        EventManager.Instance.onCardPlayAnimationEnd -= RemoveCard;
+        EventManager.Instance.onPlayCard -= PlayCardAbility;
+        EventManager.Instance.onEnterAddCardGrid -= DrawCard;
+        EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
+    }
+    private void OnDestroy()
+    {
+        EventManager.Instance.onCardPlayAnimationEnd -= RemoveCard;
+        EventManager.Instance.onPlayCard -= PlayCardAbility;
+        EventManager.Instance.onEnterAddCardGrid -= DrawCard;
+        EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
+    }
+    void PlayCardAbility(ActionCardSO cardData)
+    {
+        if (cardData.cardType == CardType.Move)
+        {
+            if (isRepeat)
+            {
+                isRepeat = false;
+                EventManager.Instance.PlayMoveCard(cardData.step * 2, 1);
+                return;
+            }
+            EventManager.Instance.PlayMoveCard(cardData.step, 1);
+        }
+        else if (cardData.cardType == CardType.TradeOff)
+        {
+            if (cardData.tradeOffType == TradeOffType.Repeat)
+            {
+                isRepeat = true;
+                DropRandomCard();
+            }
+        }
+        if (handCards.Count <= 0)
+        {
+            DrawCard();
+        }
+        
     }
     public void DropRandomCard()
     {
@@ -27,7 +71,7 @@ public class HandManager : MonoBehaviour
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;
     private Vector3 baseHandPos;
-    private float hideOffsetY = -300f;
+    private float hideOffsetY = -50f;
     public enum DeckState
     {
         waiting,
@@ -131,16 +175,16 @@ public class HandManager : MonoBehaviour
             currentHandState = HandState.selecting;
         }
         RectTransform rect = hand.GetComponent<RectTransform>();
-        baseHandPos = hand.GetComponent<RectTransform>().localPosition;
         if (rect == null) return;
+        baseHandPos = rect.localPosition;
         rect.DOKill(); // stop old tween
         if (hide)
         {
-            rect.DOLocalMoveY(baseHandPos.y + hideOffsetY, 0.5f).SetEase(Ease.InCubic);
+            rect.DOLocalMoveY(baseHandPos.y + hideOffsetY, 0.5f);
         }
         else
         {
-            rect.DOLocalMoveY(baseHandPos.y - hideOffsetY, 0.5f).SetEase(Ease.OutCubic);
+            rect.DOLocalMoveY(baseHandPos.y - hideOffsetY, 0.5f);
         }
     }
 
