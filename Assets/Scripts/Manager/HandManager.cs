@@ -15,6 +15,12 @@ public class HandManager : MonoBehaviour
     [SerializeField] private GameObject hand, deck;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
+    private bool isRepeat = false;
+    public bool GetIsRepeat()
+    {
+        return isRepeat;
+    }
+
     public List<GameObject> CurrentCard()
     {
         return handCards;

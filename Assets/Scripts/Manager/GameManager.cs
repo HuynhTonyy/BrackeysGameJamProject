@@ -256,6 +256,13 @@ public class GameManager : MonoBehaviour
         CheckClouds();
         GridAction();
     }
+    public void ApplyTradeOff(TradeOffType tradeOffType)
+    {
+        if (tradeOffType == TradeOffType.Repeat)
+        {
+            
+        }
+    }
     void CheckClouds()
     {
         if (currentGrid == 0) return;

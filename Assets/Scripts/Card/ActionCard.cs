@@ -52,9 +52,8 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             switch (cardData.cardType)
             {
-                case CardType.Move: borderCard.color = Color.green; break;
-                case CardType.Buff: borderCard.color = Color.yellow; break;
-                case CardType.Debuff: borderCard.color = Color.red; break;
+                case CardType.Move: borderCard.color = Color.white; break;
+                case CardType.TradeOff: borderCard.color = Color.yellow; break;
                 default: borderCard.color = Color.white; break;
             }
         }
@@ -103,10 +102,32 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             handManager.RemoveCard(this.gameObject);
         });
-        GameManager.Instance.MovePlayer(cardData.step, 1);
+
+
+
+        PlayCardAbility();
+        
+
+
+
+
+
         if (handManager.CurrentCard().Count <= 0)
         {
             handManager.DrawCard();
         }
+    }
+    void PlayCardAbility()
+    {
+        if (cardData.cardType == CardType.Move)
+        {
+            GameManager.Instance.MovePlayer(cardData.step, 1);
+        }
+        else if (cardData.cardType == CardType.TradeOff)
+        {
+            // if (cardData.tradeOffType == TradeOffType.Repeat)
+            //     isRepeat = true;
+        }
+        
     }
 }
