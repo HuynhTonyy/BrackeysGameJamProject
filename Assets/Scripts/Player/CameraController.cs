@@ -1,46 +1,37 @@
-// using Cinemachine; // not Unity.Cinemachine
-using Unity.Cinemachine;
 using UnityEngine;
+using System.Collections;
 
-public class CameraController : MonoBehaviour
+public class SimpleCameraZoom : MonoBehaviour
 {
-    [SerializeField] private CinemachineVirtualCamera vcam;
-    [SerializeField] private Transform player;
+    [SerializeField] private Camera mainCamera;  // your player camera
+    [SerializeField] private float mapZoomSize = 20f;   // zoomed out (see map)
+    [SerializeField] private float playerZoomSize = 5f; // zoomed in (follow player)
+    [SerializeField] private float zoomDuration = 2f;   // how long to zoom
 
     private void Start()
     {
-        // Make sure vcam follows player
-        if (vcam != null && player != null)
-            vcam.Follow = player;
+        if (mainCamera == null)
+            mainCamera = Camera.main;
 
-        // Default zoom level
-        vcam.m_Lens.OrthographicSize = 5f;
+        // Start zoomed out
+        mainCamera.orthographicSize = mapZoomSize;
+
+        // Start coroutine to zoom into player
+        StartCoroutine(ZoomToPlayer());
     }
 
-    // Example: call this to zoom out to world view
-    public void ZoomOut(float size, float duration = 1f)
+    private IEnumerator ZoomToPlayer()
     {
-        StartCoroutine(ZoomRoutine(size, duration));
-    }
-
-    // Example: call this to zoom back to player
-    public void ZoomIn(float size, float duration = 1f)
-    {
-        StartCoroutine(ZoomRoutine(size, duration));
-    }
-
-    private System.Collections.IEnumerator ZoomRoutine(float targetSize, float duration)
-    {
-        float startSize = vcam.m_Lens.OrthographicSize;
+        float startSize = mainCamera.orthographicSize;
         float t = 0f;
 
-        while (t < duration)
+        while (t < zoomDuration)
         {
             t += Time.deltaTime;
-            vcam.m_Lens.OrthographicSize = Mathf.Lerp(startSize, targetSize, t / duration);
+            mainCamera.orthographicSize = Mathf.Lerp(startSize, playerZoomSize, t / zoomDuration);
             yield return null;
         }
 
-        vcam.m_Lens.OrthographicSize = targetSize;
+        mainCamera.orthographicSize = playerZoomSize;
     }
 }
