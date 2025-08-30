@@ -19,20 +19,21 @@ public class GameManager : MonoBehaviour
     [SerializeField] int gridPerRow;
     int currentGrid = 0;
     List<(GridSO, GameObject,bool)> grids = new List<(GridSO, GameObject,bool)>();
-    [SerializeField] int maxTurn;
+    [SerializeField] int maxStamina;
     [SerializeField] TMP_Text turnText;
     [SerializeField] TMP_Text gridText;
     [SerializeField] int vision = 3;
-    int turnRemain;
+    int stamina;
     [SerializeField] private float pathLength;
     [SerializeField] private float borderLimit;
     [SerializeField] private int minPerDir;
     [SerializeField] private GameObject pathObj;
     private List<GameObject> paths = new List<GameObject>();
-    [SerializeField] private int turnUntilSink;
+    [SerializeField]private int maxTurnToSink;
+     private int turnToSink;
     [SerializeField] private int sinkNum;
-    [SerializeField] private HandManager handManager;
     private int sinkedGridIndex = 0;
+    private int currentTurnToSink = 0;
     [SerializeField] private GameObject endPanel;
     public static GameManager Instance { get; private set; }
 
@@ -40,6 +41,18 @@ public class GameManager : MonoBehaviour
     private GameManager()
     {
 
+    }
+    private void OnEnable() {
+        if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayMoveCard += MovePlayer;
+    }
+    private void OnDisable() {
+        if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayMoveCard -= MovePlayer;
+    }
+    private void OnDestroy() {
+        if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     void Awake()
     {
@@ -55,10 +68,10 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-
+        turnToSink = maxTurnToSink;
         endPanel.SetActive(false);
-        turnRemain = maxTurn;
-        turnText.SetText("Turn remain: " + turnRemain);
+        stamina = maxStamina;
+        turnText.SetText("Stamina remain: " + stamina);
         gridText.SetText("Current grid: " + currentGrid);
         player.SetActive(true);
         InitGrid();
@@ -69,8 +82,8 @@ public class GameManager : MonoBehaviour
         int previousGridTypeIndex = -1;
         for (int i = 0; i < gridNum; i++)
         {
-            Vector3 gridPos = InitGridPosition(i);
-            Debug.Log(i+"-"+gridPos);
+            Vector3 gridPos = GetNewGridPosition(i);
+            // Debug.Log(i+"-"+gridPos);
             int randomIndex = Random.Range(0, gridTypes.Count);
             if (i == 0)
             {
@@ -130,8 +143,13 @@ public class GameManager : MonoBehaviour
             paths.Add(newPathObj);
             Vector3 distance = grids[i + 1].Item2.transform.position - grids[i].Item2.transform.position;
             float angle = Mathf.Atan2(distance.y, distance.x) * Mathf.Rad2Deg;
-            newPathObj.transform.DORotate(new Vector3(0, 0, angle), 0.25f);
+            newPathObj.transform.DORotate(new Vector3(0, 0, angle-360), 0.25f);
         }
+    }
+    Vector3 GetNewGridPosition(int index)
+    {
+        if(index == 0) return Vector3.zero;
+        return grids[index - 1].Item2.transform.position + Vector3.right * pathLength;
     }
     bool CheckReachMinPerDir(int index)
     {
@@ -153,76 +171,76 @@ public class GameManager : MonoBehaviour
         if (numSameDir >= minPerDir) return true;
         else return false;
     }
-    Vector3 InitGridPosition(int index)
-    {
-        Vector3 direction = Vector3.zero;
-        if (index == 0)
-        {
-            return direction;
-        }
-        else if (index == 1)
-        {
-            Vector3 xAxis = Vector3.zero;
-            Vector3 yAxis = Vector3.zero;
-            int xMaxOption = 2;
-            int yRandomNum = Random.Range(0, 2);
-            if (yRandomNum == 0)
-            {
-                yAxis = Vector3.up;
-                xMaxOption = 2;
-            }
-            int xRandomNum = Random.Range(0, xMaxOption);
-            if (xRandomNum == 0)
-            {
-                xAxis = Vector3.left;
-            }
-            else if (xRandomNum == 1)
-            {
-                xAxis = Vector3.right;
-            }
-            direction = (xAxis + yAxis).normalized;
-        }
-        else
-        {
-            if (grids[index - 1].Item2.transform.position.x <= -borderLimit)
-            {
-                direction = ((Random.Range(0, 2) == 0 ? Vector3.left : Vector3.zero) + Vector3.up).normalized;
-            }
-            else if (grids[index - 1].Item2.transform.position.x >= borderLimit)
-            {
-                direction = ((Random.Range(0, 2) == 0 ? Vector3.right : Vector3.zero) + Vector3.up).normalized;
-            }
-            else if (CheckReachMinPerDir(index))
-            {
-                Vector3 xAxis = Vector3.zero;
+    // Vector3 InitGridPosition(int index)
+    // {
+    //     Vector3 direction = Vector3.zero;
+    //     if (index == 0)
+    //     {
+    //         return direction;
+    //     }
+    //     else if (index == 1)
+    //     {
+    //         Vector3 xAxis = Vector3.zero;
+    //         Vector3 yAxis = Vector3.zero;
+    //         int xMaxOption = 2;
+    //         int yRandomNum = Random.Range(0, 2);
+    //         if (yRandomNum == 0)
+    //         {
+    //             yAxis = Vector3.up;
+    //             xMaxOption = 2;
+    //         }
+    //         int xRandomNum = Random.Range(0, xMaxOption);
+    //         if (xRandomNum == 0)
+    //         {
+    //             xAxis = Vector3.left;
+    //         }
+    //         else if (xRandomNum == 1)
+    //         {
+    //             xAxis = Vector3.right;
+    //         }
+    //         direction = (xAxis + yAxis).normalized;
+    //     }
+    //     else
+    //     {
+    //         if (grids[index - 1].Item2.transform.position.x <= -borderLimit)
+    //         {
+    //             direction = ((Random.Range(0, 2) == 0 ? Vector3.left : Vector3.zero) + Vector3.up).normalized;
+    //         }
+    //         else if (grids[index - 1].Item2.transform.position.x >= borderLimit)
+    //         {
+    //             direction = ((Random.Range(0, 2) == 0 ? Vector3.right : Vector3.zero) + Vector3.up).normalized;
+    //         }
+    //         else if (CheckReachMinPerDir(index))
+    //         {
+    //             Vector3 xAxis = Vector3.zero;
 
-                int xRandomNum = Random.Range(0, 3);
-                if (xRandomNum == 0)
-                {
-                    xAxis = Vector3.left;
-                }
-                else if (xRandomNum == 1)
-                {
-                    xAxis = Vector3.right;
-                }
-                direction = (xAxis + Vector3.up).normalized;
-                Debug.Log("can chang dir:" + direction);
-            }
-            else
-            {
+    //             int xRandomNum = Random.Range(0, 3);
+    //             if (xRandomNum == 0)
+    //             {
+    //                 xAxis = Vector3.left;
+    //             }
+    //             else if (xRandomNum == 1)
+    //             {
+    //                 xAxis = Vector3.right;
+    //             }
+    //             direction = (xAxis + Vector3.up).normalized;
+    //             // Debug.Log("can chang dir:" + direction);
+    //         }
+    //         else
+    //         {
 
-                direction = (grids[index - 1].Item2.transform.position - grids[index - 2].Item2.transform.position).normalized;
-                Debug.Log(grids[index - 1].Item2.transform.position +"-"+ grids[index - 2].Item2.transform.position);
-                Debug.Log("same dir:" + direction);
-            }
-        }
-        Vector3 gridPos = grids[index - 1].Item2.transform.position + direction * pathLength;
-        return gridPos;
-    }
+    //             direction = (grids[index - 1].Item2.transform.position - grids[index - 2].Item2.transform.position).normalized;
+    //             // Debug.Log(grids[index - 1].Item2.transform.position +"-"+ grids[index - 2].Item2.transform.position);
+    //             // Debug.Log("same dir:" + direction);
+    //         }
+    //     }
+    //     Vector3 gridPos = grids[index - 1].Item2.transform.position + direction * pathLength;
+    //     return gridPos;
+    // }
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && turnRemain > 0)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && stamina > 0)
         {
             int moveStep = Random.Range(1, 4);
             MovePlayer(moveStep, 1);
@@ -232,7 +250,7 @@ public class GameManager : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
-    public void MovePlayer(int step, int turnUsed)
+    public void MovePlayer(int step, int staminaUsed)
     {
         currentGrid += step;
         if (currentGrid >= gridNum)
@@ -246,14 +264,14 @@ public class GameManager : MonoBehaviour
             // return;
         }
         player.transform.position = grids[currentGrid].Item2.transform.position;
-        if (turnUsed > 0)
+        if (staminaUsed > 0)
         {
-            turnRemain -= turnUsed;
-            turnText.SetText("Turn remain: " + turnRemain);
+            stamina -= staminaUsed;
+            turnText.SetText("Stamina remain: " + stamina);
             Sink();
         }
         gridText.SetText("Current grid: " + currentGrid);
-        CheckClouds();
+        ClearCloudsInDistance(currentGrid, vision);
         GridAction();
     }
     public void ApplyTradeOff(TradeOffType tradeOffType)
@@ -263,10 +281,10 @@ public class GameManager : MonoBehaviour
             
         }
     }
-    void CheckClouds()
+    void ClearCloudsInDistance(int startGrid, int distance)
     {
-        if (currentGrid == 0) return;
-        for (int i = 0; i <= vision; i++)
+        if (startGrid == 0) return;
+        for (int i = 0; i <= distance; i++)
         {
             int cloudIndex = currentGrid - 1 + i;
             if (cloudIndex <= clouds.Count)
@@ -280,24 +298,6 @@ public class GameManager : MonoBehaviour
             }
 
         }
-        // for (int i = 0; i < clouds.Count; i++)
-        // {
-        //     if (i >= currentGrid - 1 && i < currentGrid + vision)
-        //     {
-        //         clouds[i].SetActive(false);
-        //     }
-        //     else
-        //     {
-        //         clouds[i].SetActive(true);
-        //     }
-        // if (i < currentGrid - 1)
-        // {
-        //     int randomIndex = Random.Range(0, gridTypes.Count);
-        //     GameObject gridObj = Instantiate(gridTypes[randomIndex].gameObject, GetGridPosition(i + 1), Quaternion.identity);
-        //     Destroy(grids[i + 1].Item2);    
-        //     grids[i + 1] =(gridTypes[randomIndex], gridObj);
-        // }
-        // }
     }
     void GridAction()
     {
@@ -307,7 +307,7 @@ public class GameManager : MonoBehaviour
                     endPanel.SetActive(true);
 
         }
-        else if (turnRemain == 0 || currentGrid <= sinkedGridIndex)
+        else if (stamina == 0 || currentGrid <= sinkedGridIndex)
         {
                     endPanel.SetActive(true);
 
@@ -327,33 +327,34 @@ public class GameManager : MonoBehaviour
                     StartCoroutine(MoveCoroutine(-1));
                     break;
                 case GridSO.GridType.AddCard:
-                    handManager.DrawCard();
+                    EventManager.Instance.EnterAddCardGrid();
                     break;
                 case GridSO.GridType.DropCard:
-                    handManager.DropRandomCard();
+                    EventManager.Instance.EnterDropCardGrid();
                     break;
-                case GridSO.GridType.IceLake:
-                    turnRemain--;
-                    turnText.SetText("Turn remain: " + turnRemain);
-                    if (turnRemain == 0)
+                case GridSO.GridType.CursedFrog:
+                    stamina--;
+                    turnText.SetText("Stamina remain: " + stamina);
+                    if (stamina == 0)
                     {
                                 endPanel.SetActive(true);
 
                     }
                     break;
                 case GridSO.GridType.Scout:
+                    ClearCloudsInDistance(currentGrid, 6);
                     break;
                 case GridSO.GridType.Swamp:
-                    if (turnRemain > 2)
+                    if (stamina > 2)
                     {
-                        turnRemain -= 2;
-                        turnText.SetText("Turn remain: " + turnRemain);
+                        stamina -= 2;
+                        turnText.SetText("Stamina remain: " + stamina);
 
                     }
                     else
                     {
-                        turnRemain = 0;
-                                endPanel.SetActive(true);
+                        stamina = 0;
+                        endPanel.SetActive(true);
 
                     }
                     break;
@@ -363,27 +364,37 @@ public class GameManager : MonoBehaviour
                     break;
             }
             grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
-            // if (visitedGridIndex != -1)
-            // {
-            //     GameObject gridObj = Instantiate(emptyGrid.gameObject, grids[visitedGridIndex].Item2.transform.position, Quaternion.identity);
-            // Destroy(grids[visitedGridIndex].Item2);    
-            // grids[visitedGridIndex] =(gridTypes[visitedGridIndex], gridObj,);
-            // }
-            // visitedGridIndex = currentGrid;
-            // Sink();
 
         }
     }
     void Sink()
     {
-        if (maxTurn - turnRemain < turnUntilSink) return;
-        int sinkToIndex = (maxTurn - turnRemain) / turnUntilSink * sinkNum;
-        for (int i = sinkToIndex - sinkNum; i < sinkToIndex; i++)
+        if(turnToSink <=0 || sinkNum <=0) return;
+        currentTurnToSink++;
+        if(currentTurnToSink >= turnToSink)
         {
-            grids[i].Item2.SetActive(false);
-            paths[i].SetActive(false);
+            currentTurnToSink = 0;
+            int sinkToIndex = sinkedGridIndex + sinkNum;
+            if(sinkToIndex >= gridNum -1)
+            {
+                sinkToIndex = gridNum -2;
+            }
+            for (int i = sinkedGridIndex; i < sinkToIndex; i++)
+            {
+                grids[i].Item2.SetActive(false);
+                if(i < paths.Count)
+                {
+                    paths[i].SetActive(false);
+                }
+                
+            }
+            sinkedGridIndex = sinkToIndex-1;
+            if(currentGrid <= sinkedGridIndex)
+            {
+                Debug.Log("Da bi pha");
+                endPanel.SetActive(true);
+            }
         }
-        sinkedGridIndex = sinkToIndex-1;
     }
     IEnumerator MoveCoroutine(int step)
     {
