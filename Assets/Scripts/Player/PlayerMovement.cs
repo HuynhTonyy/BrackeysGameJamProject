@@ -1,29 +1,34 @@
 using UnityEngine;
 using DG.Tweening;
 using System;
+using System.Collections.Generic;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private float gridRadius;
     [SerializeField] private float jumpDistance;
     [SerializeField] private float jumpPower;
+    [SerializeField] private float knockbackJumpPower;
     private float newGridRadius;
     private float newJumpDistance;
     private void OnEnable()
     {
         EventManager.Instance.onPlayMoveCard += PlayMoveAnimation;
         EventManager.Instance.onEnterMoveForwardGrid += PlayMoveAnimation;
+        EventManager.Instance.onExplodeBomb += PlayKnockbackAnimation;
         EventManager.Instance.onEnterPortalGrid += AppearInLocation;
     }
     private void OnDisable()
     {
         EventManager.Instance.onPlayMoveCard -= PlayMoveAnimation;
         EventManager.Instance.onEnterPortalGrid -= AppearInLocation;
+        EventManager.Instance.onExplodeBomb -= PlayKnockbackAnimation;
         EventManager.Instance.onEnterMoveForwardGrid -= PlayMoveAnimation;
     }
     private void OnDestroy() {
         EventManager.Instance.onEnterPortalGrid -= AppearInLocation;
         EventManager.Instance.onPlayMoveCard -= PlayMoveAnimation;
+        EventManager.Instance.onExplodeBomb -= PlayKnockbackAnimation;
         EventManager.Instance.onEnterMoveForwardGrid -= PlayMoveAnimation;
         
     }
@@ -48,6 +53,26 @@ public class PlayerMovement : MonoBehaviour
         {
             mainSequence.Append(GetSubSequence(currentPos));
             currentPos += new Vector3(segmentDistance, 0, 0);
+        }
+        mainSequence.AppendCallback(() =>
+        {
+            transform.position = currentPos;
+            EventManager.Instance.PlayerMoveEnd();
+        });
+
+    }
+    void PlayKnockbackAnimation()
+    {
+        if (animator == null) return;
+        Sequence mainSequence = DOTween.Sequence();
+        List<float> bounceDistance = new List<float>{ newGridRadius+newJumpDistance, newGridRadius*0.8f, newGridRadius*0.2f};
+        List<float> bouncePower = new List<float>{ knockbackJumpPower, knockbackJumpPower * 0.6f, knockbackJumpPower * 0.15f };
+        List<float> bounceDuration = new List<float>{ 0.6f, 0.4f, 0.2f };
+        Vector3 currentPos = transform.position;
+        for (int i = 0; i < 3; i++)
+        {
+            currentPos += new Vector3(-bounceDistance[i],0,0);
+            mainSequence.Append(transform.DOJump(currentPos, bouncePower[i], 1, bounceDuration[i]).SetEase(Ease.InOutQuad));
         }
         mainSequence.AppendCallback(() =>
         {

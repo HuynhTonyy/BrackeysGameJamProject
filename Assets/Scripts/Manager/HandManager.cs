@@ -48,7 +48,12 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.OnCompleteAction -= ShowHand;
 
     }
-    private void ShowHand() {
+    private void AddCard() {
+        EventManager.Instance.CardChange(1);
+        DrawCard();
+    }
+    private void ShowHand()
+    {
         ChangeHandState(HandState.selecting);
     }
     void PlayCardAbility(ActionCardSO cardData)
@@ -81,11 +86,16 @@ public class HandManager : MonoBehaviour
         if (handCards.Count <= 0)
         {
             DrawCard();
+            DrawCard();
         }
     }
     public void DropRandomCard()
     {
-        if (handCards.Count == 0) return;
+        if (handCards.Count == 0)
+        {
+            CheckEmptyHand();
+            return;
+        }
         // Pick a random card
         GameObject randomCard = handCards[Random.Range(0, handCards.Count)];
         ActionCard card = randomCard.GetComponent<ActionCard>();
@@ -94,10 +104,15 @@ public class HandManager : MonoBehaviour
         // Animate it "dropping" or fading out (optional)
         // Remove from hand
         handCards.Remove(randomCard);
+        EventManager.Instance.CardChange(-1);
         randomCard.transform.DOMoveY(-Screen.height, 0.5f) // fly downwards
-            .OnComplete(() => Destroy(randomCard)); // then destroy it
+            .OnComplete(() =>
+            {
+                Destroy(randomCard);
+            }); // then destroy it
         CheckEmptyHand();
         UpdateCardPosition(handCards, splineContainer.Spline);
+        
     }
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;

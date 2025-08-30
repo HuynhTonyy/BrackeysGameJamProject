@@ -57,6 +57,11 @@ public class EventManager : MonoBehaviour
     {
         Instance?.onPlayerMoveEnd?.Invoke();
     }
+    public event Action OnCompleteAction;
+    public void CompleteAction()
+    {
+        Instance?.OnCompleteAction?.Invoke();
+    }
     #region Grid Events
     public event Action<Vector3> onEnterPortalGrid;
     public void EnterPortalGrid(Vector3 newPosition)
@@ -78,16 +83,33 @@ public class EventManager : MonoBehaviour
     {
         Instance?.onEnterMoveForwardGrid.Invoke(step, staminaUsed);
     }
-    public event Action onEnterMoveBackwardGrid;
-    public void EnterMoveBackwardGrid()
+    public event Action<int> onEnterMoveBackwardGrid;
+    public void EnterMoveBackwardGrid(int step)
     {
-        Instance?.onEnterMoveBackwardGrid?.Invoke();
+        Instance?.onEnterMoveBackwardGrid?.Invoke(step);
+    }
+    public event Action onExplodeBomb;
+    public void ExplodeBomb()
+    {
+        Instance?.onExplodeBomb?.Invoke();
     }
     #endregion
-    public event Action OnCompleteAction;
-    public void CompleteAction()
-    {
-        Instance?.OnCompleteAction?.Invoke();
-    }
 
+    #region Nofity Events
+    public event Action<int> onStaminaChange;
+    public void StaminaChange(int amount)
+    {
+        Instance?.onStaminaChange?.Invoke(amount);
+    }
+    public event Action<int> onCardChange;
+    public void CardChange(int amount)
+    {
+        Instance?.onCardChange?.Invoke(amount);
+    }
+    public event Action<int> onDistanceChange;
+    public void DistanceChange(int amount)
+    {
+        Instance?.onDistanceChange?.Invoke(amount);
+    }
+    #endregion
 }

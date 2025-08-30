@@ -270,6 +270,7 @@ public class GameManager : MonoBehaviour
         if (staminaUsed > 0)
         {
             stamina -= staminaUsed;
+            EventManager.Instance.StaminaChange(-staminaUsed);
             staminaText.SetText(stamina.ToString());
             Sink();
         }
@@ -340,6 +341,7 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.CursedFrog:
                         stamina--;
+                        EventManager.Instance.StaminaChange(-1);
                         isOperating = false;
                         staminaText.SetText(stamina.ToString());
                         if (stamina == 0)
@@ -357,6 +359,7 @@ public class GameManager : MonoBehaviour
                         if (stamina > 2)
                         {
                             stamina -= 2;
+                            EventManager.Instance.StaminaChange(-2);
                             staminaText.SetText(stamina.ToString());
 
                         }
@@ -376,6 +379,14 @@ public class GameManager : MonoBehaviour
                         break;
                 }
                 grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
+                foreach (Transform child in grids[currentGrid].Item2.transform)
+                {
+                    if (child.gameObject.CompareTag("IslandOverlay"))
+                    {
+                        child.gameObject.SetActive(false);
+                        break;
+                    }
+                }
             }
 
         }
@@ -406,7 +417,7 @@ public class GameManager : MonoBehaviour
                 }
                 
             }
-            sinkedGridIndex = sinkToIndex-1;
+            sinkedGridIndex = sinkToIndex;
             if(currentGrid <= sinkedGridIndex)
             {
                 Debug.Log("Da bi pha");
@@ -416,8 +427,12 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator MoveCoroutine(int step)
     {
-        yield return new WaitForSeconds(1f);
-        EventManager.Instance.EnterMoveForwardGrid(step,0);
+        yield return new WaitForSeconds(0.25f);
+        if(step > 0)
+            EventManager.Instance.EnterMoveForwardGrid(step,0);
+        else
+            EventManager.Instance.EnterMoveBackwardGrid(step);
+        EventManager.Instance.DistanceChange(step);
         MovePlayer(step,0);
     }
     IEnumerator TeleportCoroutine()
@@ -443,6 +458,7 @@ public class GameManager : MonoBehaviour
         }
         grids[currentGrid].Item2.GetComponent<Portal>().Active(true);
         yield return new WaitForSeconds(1.5f);
+        EventManager.Instance.DistanceChange(randomGrid - currentGrid);
         grids[currentGrid].Item2.GetComponent<Portal>().Active(false);
         EventManager.Instance.EnterPortalGrid(grids[randomGrid].Item2.transform.position);
         MovePlayer(randomGrid - currentGrid, 0);
