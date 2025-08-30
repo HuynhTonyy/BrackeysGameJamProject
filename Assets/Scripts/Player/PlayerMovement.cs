@@ -49,15 +49,15 @@ public class PlayerMovement : MonoBehaviour
     Sequence GetSubSequence(Vector3 currentPos) {
         Sequence subSequence = DOTween.Sequence();
         float newX = currentPos.x + gridRadius;
-        subSequence.Append(transform.DOMoveX(newX, 1f).SetEase(Ease.Linear));
+        subSequence.Append(transform.DOMoveX(newX, 0.5f).SetEase(Ease.Linear));
         subSequence.AppendCallback(() =>
         {
             animator.SetBool("IsMoving", false);
             animator.SetBool("IsJumping", true);
         });
         Vector3 jumpTo = new Vector3(newX + jumpDistance, currentPos.y, currentPos.z);
-        subSequence.Append(transform.DOJump(jumpTo, jumpPower, 2, 1.5f).SetEase(Ease.Linear));
-        subSequence.Append(transform.DOMoveX(jumpTo.x + gridRadius, 1f).SetEase(Ease.Linear));
+        subSequence.Append(transform.DOJump(jumpTo, jumpPower, 2, 0.5f).SetEase(Ease.Linear));
+        subSequence.Append(transform.DOMoveX(jumpTo.x + gridRadius, 0.5f).SetEase(Ease.Linear));
         subSequence.AppendCallback(() =>
         {
             animator.SetBool("IsJumping", false);
