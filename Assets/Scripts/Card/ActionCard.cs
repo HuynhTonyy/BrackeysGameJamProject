@@ -10,6 +10,9 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     [Header("UI References")]
     // [SerializeField] private TMP_Text cardNameText;
     // [SerializeField] private TMP_Text cardDescriptionText;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip playCardSound;
+
     private HandManager handManager;
     private Image borderCard;
     private bool isHovered;
@@ -18,6 +21,8 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private Button button;
     private RectTransform rectTransform;
     private Vector3 baseLocalPos, originalScale;
+    public enum CardLocation { Deck, Hand }
+    public CardLocation Location { get; set; }
 
     void Awake()
     {
@@ -87,12 +92,21 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnCardClickToPlay()
     {
-        if (!isPlayed || !interactable) return;
+        if (!interactable || !isPlayed) return;
+        if (Location == CardLocation.Deck)
+        {
+            handManager.AddCardToHand(this);
+            Location = CardLocation.Hand;
+            return;
+        }
+
         isPlayed = false;
         interactable = false;
         isHovered = false;
+
         PlayCardAnimation();
         EventManager.Instance.PlayCard(cardData);
+
     }
     void PlayCardAnimation()
     {
@@ -107,6 +121,10 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             EventManager.Instance.CardPlayAnimationEnd(this.gameObject);
         });
+        if (audioSource != null && playCardSound != null)
+        {
+            audioSource.PlayOneShot(playCardSound);
+        }
     }
-    
+
 }
