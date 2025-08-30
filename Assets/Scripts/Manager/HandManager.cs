@@ -25,6 +25,7 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onEnterAddCardGrid += DrawCard;
         EventManager.Instance.onEnterDropCardGrid += DropRandomCard;
         EventManager.Instance.OnCompleteAction += ShowHand;
+        EventManager.Instance.onPlayerMoveEnd += CheckEmptyHand;
         
     }
     private void OnDisable()
@@ -33,6 +34,7 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onPlayCard -= PlayCardAbility;
         EventManager.Instance.onEnterAddCardGrid -= DrawCard;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
+        EventManager.Instance.onPlayerMoveEnd -= CheckEmptyHand;
         EventManager.Instance.OnCompleteAction -= ShowHand;
 
     }
@@ -41,6 +43,7 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onCardPlayAnimationEnd -= RemoveCard;
         EventManager.Instance.onPlayCard -= PlayCardAbility;
         EventManager.Instance.onEnterAddCardGrid -= DrawCard;
+        EventManager.Instance.onPlayerMoveEnd -= CheckEmptyHand;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
         EventManager.Instance.OnCompleteAction -= ShowHand;
 
@@ -57,9 +60,11 @@ public class HandManager : MonoBehaviour
             {
                 isRepeat = false;
                 EventManager.Instance.PlayMoveCard(cardData.step * 2, 1);
-                return;
             }
-            EventManager.Instance.PlayMoveCard(cardData.step, 1);
+            else
+            {
+                EventManager.Instance.PlayMoveCard(cardData.step, 1);
+            }
         }
         else if (cardData.cardType == CardType.TradeOff)
         {
@@ -69,11 +74,14 @@ public class HandManager : MonoBehaviour
                 DropRandomCard();
             }
         }
+        UpdateCardPosition(handCards, splineContainer.Spline);
+    }
+    void CheckEmptyHand()
+    {
         if (handCards.Count <= 0)
         {
             DrawCard();
         }
-        UpdateCardPosition(handCards, splineContainer.Spline);
     }
     public void DropRandomCard()
     {
@@ -83,11 +91,12 @@ public class HandManager : MonoBehaviour
         ActionCard card = randomCard.GetComponent<ActionCard>();
         // Disable its interaction
         card.EnablePlay(false);
+        // Animate it "dropping" or fading out (optional)
         // Remove from hand
         handCards.Remove(randomCard);
-        // Animate it "dropping" or fading out (optional)
         randomCard.transform.DOMoveY(-Screen.height, 0.5f) // fly downwards
             .OnComplete(() => Destroy(randomCard)); // then destroy it
+        CheckEmptyHand();
         UpdateCardPosition(handCards, splineContainer.Spline);
     }
     [SerializeField] public HandState currentHandState;
