@@ -42,16 +42,20 @@ public class GameManager : MonoBehaviour
     {
 
     }
-    private void OnEnable() {
+    private void OnEnable()
+    {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd += GridAction;
         EventManager.Instance.onPlayMoveCard += MovePlayer;
     }
     private void OnDisable() {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     private void OnDestroy() {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     void Awake()
@@ -263,7 +267,6 @@ public class GameManager : MonoBehaviour
             endPanel.SetActive(true);
             // return;
         }
-        player.transform.position = grids[currentGrid].Item2.transform.position;
         if (staminaUsed > 0)
         {
             stamina -= staminaUsed;
@@ -272,14 +275,6 @@ public class GameManager : MonoBehaviour
         }
         gridText.SetText("Current grid: " + currentGrid);
         ClearCloudsInDistance(currentGrid, vision);
-        GridAction();
-    }
-    public void ApplyTradeOff(TradeOffType tradeOffType)
-    {
-        if (tradeOffType == TradeOffType.Repeat)
-        {
-            
-        }
     }
     void ClearCloudsInDistance(int startGrid, int distance)
     {
@@ -337,7 +332,7 @@ public class GameManager : MonoBehaviour
                     turnText.SetText("Stamina remain: " + stamina);
                     if (stamina == 0)
                     {
-                                endPanel.SetActive(true);
+                        endPanel.SetActive(true);
 
                     }
                     break;
@@ -361,6 +356,8 @@ public class GameManager : MonoBehaviour
                 case GridSO.GridType.Teleport:
                     Sink();
                     StartCoroutine(TeleportCoroutine());
+                    break;
+                default:
                     break;
             }
             grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
@@ -399,8 +396,9 @@ public class GameManager : MonoBehaviour
     IEnumerator MoveCoroutine(int step)
     {
         yield return new WaitForSeconds(1f);
+        EventManager.Instance.EnterMoveForwardGrid(step,0);
         MovePlayer(step,0);
-        GridAction();
+        // GridAction();
     }
     IEnumerator TeleportCoroutine()
     {
