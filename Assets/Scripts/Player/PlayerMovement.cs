@@ -13,9 +13,9 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetTrigger("Move");
         }
-        transform.DOMoveX(transform.position.x + step * 2.0f, step * 0.5f).SetEase(Ease.Linear).OnComplete(()=>
-        {
-            EventManager.Instance.PlayerMoveEnd();
-        });
+        // transform.DOMoveX(transform.position.x + step * 2.0f, step * 0.5f).SetEase(Ease.Linear).OnComplete(()=>
+        // {
+        //     EventManager.Instance.PlayerMoveEnd();
+        // });
     }
 }

@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Card 3
   m_EditorClassIdentifier: 
   cardName: Run boy!!!!
+  cardIndex: 2
   cardDescription: Player can move 3 tile forward,
   cardType: 0
   cardObject: {fileID: 2181425988099683369, guid: 739c091237d26554bba30439c943aa5a, type: 3}
   step: 3
+  tradeOffType: 0
+  isTemporary: 0
+  duration: 1
