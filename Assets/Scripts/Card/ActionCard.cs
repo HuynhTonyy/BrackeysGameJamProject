@@ -11,7 +11,7 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     // [SerializeField] private TMP_Text cardNameText;
     // [SerializeField] private TMP_Text cardDescriptionText;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip playCardSound;
+    [SerializeField] private AudioClip playCardSound, hoverCardSound;
 
     private HandManager handManager;
     private Image borderCard;
@@ -82,6 +82,11 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         isHovered = true;
         rectTransform.DOLocalMove(baseLocalPos + new Vector3(0, 100f, 0), 0.2f).SetEase(Ease.OutQuad);
         rectTransform.DOScale(originalScale * 1f, 0.2f);
+        if (audioSource != null && hoverCardSound != null)
+        {
+            audioSource.PlayOneShot(hoverCardSound);
+            // Debug.Log("Hover sound");
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -108,6 +113,11 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         PlayCardAnimation();
         EventManager.Instance.PlayCard(cardData);
+        if (audioSource != null && playCardSound != null)
+        {
+            audioSource.PlayOneShot(playCardSound);
+            // Debug.Log("Play sound");
+        }
 
     }
     void PlayCardAnimation()
@@ -123,10 +133,7 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             EventManager.Instance.CardPlayAnimationEnd(this.gameObject);
         });
-        if (audioSource != null && playCardSound != null)
-        {
-            audioSource.PlayOneShot(playCardSound);
-        }
+        
     }
 
 }
