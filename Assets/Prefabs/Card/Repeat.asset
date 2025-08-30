@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Repeat
   m_EditorClassIdentifier: 
   cardName: Double
-  cardDescription: 'Discard 1 card so your next card play twice but '
+  cardIndex: 3
+  cardDescription: 'Discard 1 random card your next card play twice but '
   cardType: 1
   cardObject: {fileID: 2181425988099683369, guid: aea96f3bb2395784c803bad9beb0a827, type: 3}
   step: 3

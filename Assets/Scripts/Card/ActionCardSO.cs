@@ -5,6 +5,7 @@ using UnityEngine.InputSystem.iOS;
 public class ActionCardSO : ScriptableObject
 {
     public string cardName;
+    public int cardIndex;
     public string cardDescription;
     public CardType cardType;
     public GameObject cardObject;

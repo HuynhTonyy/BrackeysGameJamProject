@@ -5,17 +5,19 @@ using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 using System.Linq;
 
-
 public class HandManager : MonoBehaviour
 {
     [SerializeField] private int maxCardSize;
     [SerializeField] private GameObject spawnPoint;
     [SerializeField] private SplineContainer splineContainer, chooseCardSplineContainer;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip drawCardSound;
     [SerializeField] private List<ActionCardSO> cardTypes;
     [SerializeField] private GameObject hand, deck;
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
     private bool isRepeat { get; set; } = false;
+
     private void OnEnable()
     {
         EventManager.Instance.onCardPlayAnimationEnd += RemoveCard;
@@ -61,17 +63,26 @@ public class HandManager : MonoBehaviour
         {
             DrawCard();
         }
-        
+        UpdateCardPosition(handCards, splineContainer.Spline);
     }
     public void DropRandomCard()
     {
+        if (handCards.Count == 0) return;
+        // Pick a random card
         GameObject randomCard = handCards[Random.Range(0, handCards.Count)];
-        RemoveCard(randomCard);
+        ActionCard card = randomCard.GetComponent<ActionCard>();
+        // Disable its interaction
+        card.EnablePlay(false);
+        // Remove from hand
+        handCards.Remove(randomCard);
+        // Animate it "dropping" or fading out (optional)
+        randomCard.transform.DOMoveY(-Screen.height, 0.5f) // fly downwards
+            .OnComplete(() => Destroy(randomCard)); // then destroy it
     }
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;
     private Vector3 baseHandPos;
-    private float hideOffsetY = -50f;
+    private float hideOffsetY = 350f;
     public enum DeckState
     {
         waiting,
@@ -89,22 +100,21 @@ public class HandManager : MonoBehaviour
     public void ChangeDeckState(DeckState newDeckState)
     {
         currentDeckState = newDeckState;
+        ShowSelectedDeck();
         // 🔹 Handle Deck State
         switch (currentDeckState)
         {
             case DeckState.selecting:
                 SetDeckPlayble(true);
                 break;
-
-            case DeckState.waiting:
-                // maybe show empty deck or idle
-                ShowSelectedDeck();
-                SetDeckPlayble(false);
-                ChangeHandState(HandState.discarding);
-                break;
-
+            // case DeckState.waiting:
+            //     // maybe show empty deck or idle
+            //     SetDeckPlayble(false);
+            //     break;
             case DeckState.hiding:
                 HideSelectedDeck();
+                SetDeckPlayble(false);
+                ChangeHandState(HandState.selecting);
                 break;
         }
     }
@@ -127,8 +137,11 @@ public class HandManager : MonoBehaviour
                 SetHandPlayble(false);
                 HideHand(true);
                 break;
-
-            case HandState.discarding:
+            // case HandState.discarding:
+            //     SetHandPlayble(true);
+            //     HideHand(false);
+            //     break;
+            default:
                 SetHandPlayble(true);
                 HideHand(false);
                 break;
@@ -170,27 +183,29 @@ public class HandManager : MonoBehaviour
     }
     private void HideHand(bool hide)
     {
-        if (currentHandState == HandState.hiding && hide == false)
-        {
-            currentHandState = HandState.selecting;
-        }
         RectTransform rect = hand.GetComponent<RectTransform>();
         if (rect == null) return;
-        baseHandPos = rect.localPosition;
-        rect.DOKill(); // stop old tween
-        if (hide)
+
+        rect.DOKill();
+
+        if (hide && currentHandState == HandState.hiding)
         {
-            rect.DOLocalMoveY(baseHandPos.y + hideOffsetY, 0.5f);
+            // Move down off screen
+            rect.DOLocalMoveY(baseHandPos.y - hideOffsetY, 0.5f);
         }
         else
         {
-            rect.DOLocalMoveY(baseHandPos.y - hideOffsetY, 0.5f);
+            // Always reset back to spawn pos
+            rect.DOLocalMoveY(baseHandPos.y, 0.5f);
         }
     }
 
     private void Start()
     {
         InitCardHand();
+        RectTransform rect = hand.GetComponent<RectTransform>();
+        if (rect != null)
+            baseHandPos = rect.localPosition;
         ChangeDeckState(DeckState.hiding);
         ChangeHandState(HandState.selecting);
 
@@ -208,8 +223,8 @@ public class HandManager : MonoBehaviour
             return new List<GameObject>();
 
         List<GameObject> sortedList = listCards
-            .OrderByDescending(c => c.GetComponent<ActionCard>().cardData.cardType)
-            .ToList();
+        .OrderByDescending(c => cardTypes.IndexOf(c.GetComponent<ActionCard>().cardData))
+        .ToList();
 
         for (int i = 0; i < sortedList.Count; i++)
         {
@@ -222,8 +237,7 @@ public class HandManager : MonoBehaviour
     public void DrawCard(GameObject cardPrefab = null)
     {
         if (handCards.Count >= maxCardSize)
-        {
-            // Shake the hand if full
+        {   // Shake the hand if full
             hand.GetComponent<RectTransform>().DOShakePosition(0.2f, new Vector3(15f, 0f, 0f), 15, 90, false, true);
             return;
         }
@@ -238,10 +252,14 @@ public class HandManager : MonoBehaviour
         handCards.Add(cardSpawned);
         handCards = SortCardByType(handCards);
         UpdateCardPosition(handCards, splineContainer.Spline);
+        if (audioSource != null && drawCardSound != null)
+        {
+            audioSource.PlayOneShot(drawCardSound);
+        }
     }
     private void UpdateCardPosition(List<GameObject> list = null, Spline spline = null)
     {
-        if (list.Count == 0) return;
+        if (list == null || list.Count == 0) return;
         float cardSpacing;
         if (spline == splineContainer.Spline)
             cardSpacing = 1f / maxCardSize;
@@ -249,8 +267,8 @@ public class HandManager : MonoBehaviour
             cardSpacing = 0.4f;
         else
             cardSpacing = 0.5f;
-
         float firstPosition = 0.5f - (list.Count - 1) * cardSpacing / 2;
+
         for (int i = 0; i < list.Count; i++)
         {
             RectTransform rect = list[i].GetComponent<RectTransform>();
@@ -279,14 +297,12 @@ public class HandManager : MonoBehaviour
     {
         // Destroy previous selection cards
         if (currentDeckState == DeckState.hiding) return;
-
         foreach (var card in selectionCards)
         {
             card.GetComponent<RectTransform>()?.DOKill();
             Destroy(card);
         }
         selectionCards.Clear();
-
         // Spawn new selection cards
         for (int i = 0; i < 3; i++)
         {
@@ -304,10 +320,30 @@ public class HandManager : MonoBehaviour
             }
             selectionCards.Add(cardSpawned);
         }
-
         selectionCards = SortCardByType(selectionCards);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
+        if (audioSource != null && drawCardSound != null)
+        {
+            audioSource.PlayOneShot(drawCardSound);
+        }
     }
+    public void AddCardToHand(ActionCard card)
+    {
+        // Remove from deck
+        if (selectionCards.Contains(card.gameObject))
+        {
+            selectionCards.Remove(card.gameObject);
+        }
+        if (!handCards.Contains(card.gameObject))
+        {
+            handCards.Add(card.gameObject);
+        }
+        card.transform.SetParent(hand.transform, false);
+        handCards = SortCardByType(handCards);
+        UpdateCardPosition(handCards, splineContainer.Spline);
+        ChangeDeckState(DeckState.hiding);
+    }
+
     public void RemoveCard(GameObject card)
     {
         if (card == null) return;
@@ -323,7 +359,6 @@ public class HandManager : MonoBehaviour
         // Recalculate positions
         UpdateCardPosition(handCards, splineContainer.Spline);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
-
     }
     private void Update()
     {
@@ -333,6 +368,7 @@ public class HandManager : MonoBehaviour
         }
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
+
             if (currentDeckState != DeckState.hiding)
             {
                 ChangeDeckState(DeckState.hiding);
@@ -340,12 +376,13 @@ public class HandManager : MonoBehaviour
             }
             else
             {
-                ChangeDeckState(DeckState.waiting);
-                ChangeHandState(HandState.selecting);
+                ChangeDeckState(DeckState.selecting);
+                ChangeHandState(HandState.waiting);
             }
         }
         if (Keyboard.current.tKey.wasPressedThisFrame)
         {
+            ChangeDeckState(DeckState.hiding);
             if (currentHandState != HandState.hiding)
             {
                 ChangeHandState(HandState.hiding);
