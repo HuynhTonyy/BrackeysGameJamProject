@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Let's go
   cardIndex: 1
-  cardDescription: Player can move 2 tile forward,
+  cardDescription: Player can move 2 tile forward
   cardType: 0
   cardObject: {fileID: 2181425988099683369, guid: a05ededd8a6955a43acbd303515f85e5, type: 3}
   step: 2

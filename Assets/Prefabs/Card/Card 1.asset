@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Card 1
   m_EditorClassIdentifier: 
   cardName: Minor Step
-  cardDescription: Player can move 1 tile forward,
+  cardIndex: 0
+  cardDescription: Player can move 1 tile forward
   cardType: 0
   cardObject: {fileID: 2181425988099683369, guid: 691544fb240f45142a3f1701ffe243d1, type: 3}
   step: 1
+  tradeOffType: 0
+  isTemporary: 0
+  duration: 1
