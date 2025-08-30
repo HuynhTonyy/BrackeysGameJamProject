@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     int currentGrid = 0;
     List<(GridSO, GameObject,bool)> grids = new List<(GridSO, GameObject,bool)>();
     [SerializeField] int maxStamina;
-    [SerializeField] TMP_Text turnText;
+    [SerializeField] TMP_Text staminaText;
     [SerializeField] TMP_Text gridText;
     [SerializeField] int vision = 3;
     int stamina;
@@ -75,8 +75,8 @@ public class GameManager : MonoBehaviour
         turnToSink = maxTurnToSink;
         endPanel.SetActive(false);
         stamina = maxStamina;
-        turnText.SetText("Stamina remain: " + stamina);
-        gridText.SetText("Current grid: " + currentGrid);
+        staminaText.SetText(stamina.ToString());
+        gridText.SetText(currentGrid.ToString());
         player.SetActive(true);
         InitGrid();
 
@@ -270,11 +270,12 @@ public class GameManager : MonoBehaviour
         if (staminaUsed > 0)
         {
             stamina -= staminaUsed;
-            turnText.SetText("Stamina remain: " + stamina);
+            staminaText.SetText(stamina.ToString());
             Sink();
         }
-        gridText.SetText("Current grid: " + currentGrid);
+        gridText.SetText(currentGrid.ToString());
         ClearCloudsInDistance(currentGrid, vision);
+
     }
     void ClearCloudsInDistance(int startGrid, int distance)
     {
@@ -282,7 +283,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i <= distance; i++)
         {
             int cloudIndex = currentGrid - 1 + i;
-            if (cloudIndex <= clouds.Count)
+            if (cloudIndex < clouds.Count)
             {
                 clouds[cloudIndex].GetComponent<Cloud>().Disappear();
 
@@ -340,7 +341,7 @@ public class GameManager : MonoBehaviour
                     case GridSO.GridType.CursedFrog:
                         stamina--;
                         isOperating = false;
-                        turnText.SetText("Stamina remain: " + stamina);
+                        staminaText.SetText(stamina.ToString());
                         if (stamina == 0)
                         {
                             endPanel.SetActive(true);
@@ -356,7 +357,7 @@ public class GameManager : MonoBehaviour
                         if (stamina > 2)
                         {
                             stamina -= 2;
-                            turnText.SetText("Stamina remain: " + stamina);
+                            staminaText.SetText(stamina.ToString());
 
                         }
                         else
@@ -418,11 +419,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         EventManager.Instance.EnterMoveForwardGrid(step,0);
         MovePlayer(step,0);
-        // GridAction();
     }
     IEnumerator TeleportCoroutine()
     {
-        yield return new WaitForSeconds(1f);
         int min = currentGrid - 6;
         if (currentGrid - 6 <= sinkedGridIndex)
         {
@@ -442,7 +441,11 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        MovePlayer(randomGrid-currentGrid,0);
+        grids[currentGrid].Item2.GetComponent<Portal>().Active(true);
+        yield return new WaitForSeconds(1.5f);
+        grids[currentGrid].Item2.GetComponent<Portal>().Active(false);
+        EventManager.Instance.EnterPortalGrid(grids[randomGrid].Item2.transform.position);
+        MovePlayer(randomGrid - currentGrid, 0);
         GridAction();
     }
     void EndGame()

@@ -58,6 +58,11 @@ public class EventManager : MonoBehaviour
         Instance?.onPlayerMoveEnd?.Invoke();
     }
     #region Grid Events
+    public event Action<Vector3> onEnterPortalGrid;
+    public void EnterPortalGrid(Vector3 newPosition)
+    {
+        Instance?.onEnterPortalGrid?.Invoke(newPosition);
+    }
     public event Action<GameObject> onEnterAddCardGrid;
     public void EnterAddCardGrid(GameObject cardPrefab = null)
     {
