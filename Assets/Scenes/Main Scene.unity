@@ -418,6 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
+  player: {fileID: 0}
   mapZoomSize: 20
   playerZoomSize: 5
   zoomDuration: 2
@@ -734,7 +735,7 @@ Transform:
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 510417603}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &519420033
 MonoBehaviour:
@@ -749,6 +750,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 519420031}
+  player: {fileID: 510417601}
   mapZoomSize: 20
   playerZoomSize: 5
   zoomDuration: 2
@@ -1627,7 +1629,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66d08573d994fe741b122c2f72ab08c8, type: 2}
   - {fileID: 11400000, guid: ab766a3166c0eed4fba6507011db6d1e, type: 2}
   - {fileID: 11400000, guid: 4771e9177b29cb44c971cf722738ba7f, type: 2}
-  gridPerRow: 10
   maxStamina: 15
   turnText: {fileID: 1060276616}
   gridText: {fileID: 1316057055}
@@ -1968,9 +1969,6 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 519420032}
-    - targetCorrespondingSourceObject: {fileID: 8475528504286820726, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1781032378}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1935152129690754035, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
@@ -1984,6 +1982,7 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 1562499476}
   - {fileID: 404868428}
+  - {fileID: 519420032}
   - {fileID: 1957156034}
   - {fileID: 130497558}
   - {fileID: 621151537}
