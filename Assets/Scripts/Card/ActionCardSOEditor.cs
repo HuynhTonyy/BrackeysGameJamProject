@@ -11,8 +11,9 @@ public class ActionCardSOEditor : Editor
 
         // Draw default fields manually
         actionCard.cardName = EditorGUILayout.TextField("Card Name", actionCard.cardName);
+        EditorGUILayout.LabelField("Card Description");
+        actionCard.cardDescription = EditorGUILayout.TextArea(actionCard.cardDescription, GUILayout.Height(60));
         actionCard.cardIndex = EditorGUILayout.IntField("Card Index", actionCard.cardIndex);
-        actionCard.cardDescription = EditorGUILayout.TextField("Card Description", actionCard.cardDescription);
         actionCard.cardType = (CardType)EditorGUILayout.EnumPopup("Card Type", actionCard.cardType);
         actionCard.cardObject = (GameObject)EditorGUILayout.ObjectField("Card Object", actionCard.cardObject, typeof(GameObject), false);
 

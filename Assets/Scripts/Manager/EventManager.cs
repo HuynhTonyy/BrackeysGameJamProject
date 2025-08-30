@@ -68,6 +68,21 @@ public class EventManager : MonoBehaviour
     {
         Instance?.onEnterDropCardGrid?.Invoke();
     }
+    public event Action<int, int> onEnterMoveForwardGrid;
+    public void EnterMoveForwardGrid(int step, int staminaUsed)
+    {
+        Instance?.onEnterMoveForwardGrid.Invoke(step, staminaUsed);
+    }
+    public event Action onEnterMoveBackwardGrid;
+    public void EnterMoveBackwardGrid()
+    {
+        Instance?.onEnterMoveBackwardGrid?.Invoke();
+    }
     #endregion
+    public event Action OnCompleteAction;
+    public void CompleteAction()
+    {
+        Instance?.OnCompleteAction?.Invoke();
+    }
 
 }

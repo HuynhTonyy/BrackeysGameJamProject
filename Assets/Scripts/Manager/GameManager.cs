@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject cloud;
     List<GameObject> clouds = new List<GameObject>();
     [SerializeField] List<GridSO> gridTypes;
-    [SerializeField] int gridPerRow;
+    private bool isOperating = false;
     int currentGrid = 0;
     List<(GridSO, GameObject,bool)> grids = new List<(GridSO, GameObject,bool)>();
     [SerializeField] int maxStamina;
@@ -42,16 +42,20 @@ public class GameManager : MonoBehaviour
     {
 
     }
-    private void OnEnable() {
+    private void OnEnable()
+    {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd += GridAction;
         EventManager.Instance.onPlayMoveCard += MovePlayer;
     }
     private void OnDisable() {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     private void OnDestroy() {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     void Awake()
@@ -263,7 +267,6 @@ public class GameManager : MonoBehaviour
             endPanel.SetActive(true);
             // return;
         }
-        player.transform.position = grids[currentGrid].Item2.transform.position;
         if (staminaUsed > 0)
         {
             stamina -= staminaUsed;
@@ -272,14 +275,6 @@ public class GameManager : MonoBehaviour
         }
         gridText.SetText("Current grid: " + currentGrid);
         ClearCloudsInDistance(currentGrid, vision);
-        GridAction();
-    }
-    public void ApplyTradeOff(TradeOffType tradeOffType)
-    {
-        if (tradeOffType == TradeOffType.Repeat)
-        {
-            
-        }
     }
     void ClearCloudsInDistance(int startGrid, int distance)
     {
@@ -301,70 +296,92 @@ public class GameManager : MonoBehaviour
     }
     void GridAction()
     {
-        
+
         if (currentGrid == gridNum - 1)
         {
-                    endPanel.SetActive(true);
+            endPanel.SetActive(true);
 
         }
         else if (stamina == 0 || currentGrid <= sinkedGridIndex)
         {
-                    endPanel.SetActive(true);
+            endPanel.SetActive(true);
 
         }
         else
         {
-            if (!grids[currentGrid].Item3) return;
-            GridSO.GridType currentGridType = grids[currentGrid].Item1.gridType;
-            switch (currentGridType)
+            if (!grids[currentGrid].Item3)
             {
-                case GridSO.GridType.Empty:
-                    break;
-                case GridSO.GridType.MoveForward:
-                    StartCoroutine(MoveCoroutine(1));
-                    break;
-                case GridSO.GridType.MoveBackward:
-                    StartCoroutine(MoveCoroutine(-1));
-                    break;
-                case GridSO.GridType.AddCard:
-                    EventManager.Instance.EnterAddCardGrid();
-                    break;
-                case GridSO.GridType.DropCard:
-                    EventManager.Instance.EnterDropCardGrid();
-                    break;
-                case GridSO.GridType.CursedFrog:
-                    stamina--;
-                    turnText.SetText("Stamina remain: " + stamina);
-                    if (stamina == 0)
-                    {
-                                endPanel.SetActive(true);
-
-                    }
-                    break;
-                case GridSO.GridType.Scout:
-                    ClearCloudsInDistance(currentGrid, 6);
-                    break;
-                case GridSO.GridType.Swamp:
-                    if (stamina > 2)
-                    {
-                        stamina -= 2;
-                        turnText.SetText("Stamina remain: " + stamina);
-
-                    }
-                    else
-                    {
-                        stamina = 0;
-                        endPanel.SetActive(true);
-
-                    }
-                    break;
-                case GridSO.GridType.Teleport:
-                    Sink();
-                    StartCoroutine(TeleportCoroutine());
-                    break;
+                isOperating = false;
             }
-            grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
+            else
+            {
+                GridSO.GridType currentGridType = grids[currentGrid].Item1.gridType;
+                switch (currentGridType)
+                {
+                    case GridSO.GridType.Empty:
+                        isOperating = false;
+                        break;
+                    case GridSO.GridType.MoveForward:
+                        isOperating = true;
+                        StartCoroutine(MoveCoroutine(1));
+                        break;
+                    case GridSO.GridType.MoveBackward:
+                        isOperating = true;
+                        StartCoroutine(MoveCoroutine(-1));
+                        break;
+                    case GridSO.GridType.AddCard:
+                        isOperating = false;
+                        EventManager.Instance.EnterAddCardGrid();
+                        break;
+                    case GridSO.GridType.DropCard:
+                        isOperating = false;
+                        EventManager.Instance.EnterDropCardGrid();
+                        break;
+                    case GridSO.GridType.CursedFrog:
+                        stamina--;
+                        isOperating = false;
+                        turnText.SetText("Stamina remain: " + stamina);
+                        if (stamina == 0)
+                        {
+                            endPanel.SetActive(true);
 
+                        }
+                        break;
+                    case GridSO.GridType.Scout:
+                        isOperating = false;
+                        ClearCloudsInDistance(currentGrid, 6);
+                        break;
+                    case GridSO.GridType.Swamp:
+                        isOperating = false;
+                        if (stamina > 2)
+                        {
+                            stamina -= 2;
+                            turnText.SetText("Stamina remain: " + stamina);
+
+                        }
+                        else
+                        {
+                            stamina = 0;
+                            endPanel.SetActive(true);
+
+                        }
+                        break;
+                    case GridSO.GridType.Teleport:
+                        isOperating = true;
+                        Sink();
+                        StartCoroutine(TeleportCoroutine());
+                        break;
+                    default:
+                        break;
+                }
+                grids[currentGrid] = (grids[currentGrid].Item1, grids[currentGrid].Item2, false);
+            }
+
+        }
+        if (!isOperating)
+        {
+            EventManager.Instance.CompleteAction();
+            isOperating = false;
         }
     }
     void Sink()
@@ -399,8 +416,9 @@ public class GameManager : MonoBehaviour
     IEnumerator MoveCoroutine(int step)
     {
         yield return new WaitForSeconds(1f);
+        EventManager.Instance.EnterMoveForwardGrid(step,0);
         MovePlayer(step,0);
-        GridAction();
+        // GridAction();
     }
     IEnumerator TeleportCoroutine()
     {

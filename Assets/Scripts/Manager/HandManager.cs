@@ -24,6 +24,8 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onPlayCard += PlayCardAbility;
         EventManager.Instance.onEnterAddCardGrid += DrawCard;
         EventManager.Instance.onEnterDropCardGrid += DropRandomCard;
+        EventManager.Instance.OnCompleteAction += ShowHand;
+        
     }
     private void OnDisable()
     {
@@ -31,6 +33,8 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onPlayCard -= PlayCardAbility;
         EventManager.Instance.onEnterAddCardGrid -= DrawCard;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
+        EventManager.Instance.OnCompleteAction -= ShowHand;
+
     }
     private void OnDestroy()
     {
@@ -38,11 +42,17 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.onPlayCard -= PlayCardAbility;
         EventManager.Instance.onEnterAddCardGrid -= DrawCard;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
+        EventManager.Instance.OnCompleteAction -= ShowHand;
+
+    }
+    private void ShowHand() {
+        ChangeHandState(HandState.selecting);
     }
     void PlayCardAbility(ActionCardSO cardData)
     {
         if (cardData.cardType == CardType.Move)
         {
+            ChangeHandState(HandState.hiding);
             if (isRepeat)
             {
                 isRepeat = false;
@@ -78,6 +88,7 @@ public class HandManager : MonoBehaviour
         // Animate it "dropping" or fading out (optional)
         randomCard.transform.DOMoveY(-Screen.height, 0.5f) // fly downwards
             .OnComplete(() => Destroy(randomCard)); // then destroy it
+        UpdateCardPosition(handCards, splineContainer.Spline);
     }
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;
@@ -247,7 +258,7 @@ public class HandManager : MonoBehaviour
         ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
         if (actionCard != null)
         {
-            actionCard.Init(cardTypes[index], this); // pass self as manager
+            actionCard.Init(cardTypes[index], this, CardLocation.Hand); // pass self as manager
         }
         handCards.Add(cardSpawned);
         handCards = SortCardByType(handCards);
@@ -312,7 +323,7 @@ public class HandManager : MonoBehaviour
             ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
             if (actionCard != null)
             {
-                actionCard.Init(cardTypes[index], this);
+                actionCard.Init(cardTypes[index], this,CardLocation.Deck);
                 if (currentDeckState == DeckState.waiting)
                     actionCard.EnablePlay(false);
                 else

@@ -459,6 +459,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 1781032381}
+  gridRadius: 1.5
+  jumpDistance: 3
+  jumpPower: 1
 --- !u!1 &513854674
 GameObject:
   m_ObjectHideFlags: 0
@@ -1773,7 +1776,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!95 &1781032381
 Animator:
   serializedVersion: 7
@@ -1886,7 +1889,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1935152129690754035, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4034093360463539910, guid: a5ff65bc1d679cd41b8b7e22ae1b4936, type: 3}
       propertyPath: m_Sprite

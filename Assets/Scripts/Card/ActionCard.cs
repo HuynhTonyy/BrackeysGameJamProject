@@ -18,23 +18,17 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private bool isHovered;
     [SerializeField] private bool isPlayed = true;
     private bool interactable = false;
-    private Button button;
     private RectTransform rectTransform;
     private Vector3 baseLocalPos, originalScale;
-    public enum CardLocation { Deck, Hand }
-    public CardLocation Location { get; set; }
+
+    private CardLocation location { get; set; }
 
     void Awake()
     {
         borderCard = GetComponent<Image>();
         rectTransform = GetComponent<RectTransform>();
         originalScale = rectTransform.localScale;
-        button = GetComponent<Button>();
         handManager = GetComponentInParent<HandManager>();
-        // if (button != null)
-        // {
-        //     button.onClick.AddListener(OnCardClickToPlay);
-        // }
     }
     public void EnableInteraction(bool enable)
     {
@@ -45,10 +39,18 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         isPlayed = enable;
     }
-    public void Init(ActionCardSO data, HandManager manager)
+    public void Init(ActionCardSO data, HandManager manager, CardLocation cardLocation)
     {
         cardData = data;
         handManager = manager;
+        if (cardLocation == CardLocation.Deck)
+        {
+            location = CardLocation.Deck;
+        }
+        else if (cardLocation == CardLocation.Hand)
+        {
+            location = CardLocation.Hand;
+        }
         // cardNameText.SetText(cardData.cardName);
         // cardDescriptionText.SetText(cardData.cardDescription);
         baseLocalPos = transform.localPosition;
@@ -98,11 +100,10 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnCardClickToPlay()
     {
         if (!interactable || !isPlayed) return;
-        
-        if (Location == CardLocation.Deck)
+        if (location == CardLocation.Deck)
         {
             handManager.AddCardToHand(this);
-            Location = CardLocation.Hand;
+            location = CardLocation.Hand;
             return;
         }
 
@@ -136,3 +137,4 @@ public class ActionCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     }
 
 }
+public enum CardLocation { Deck, Hand }
