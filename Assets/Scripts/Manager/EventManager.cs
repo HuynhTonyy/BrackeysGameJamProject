@@ -93,6 +93,11 @@ public class EventManager : MonoBehaviour
     {
         Instance?.onExplodeBomb?.Invoke();
     }
+    public event Action<int> onIslandSinkEnd;
+    public void IslandSinkEnd(int sinkToIndex)
+    {
+        Instance?.onIslandSinkEnd?.Invoke(sinkToIndex);
+    }
     #endregion
 
     #region Nofity Events
