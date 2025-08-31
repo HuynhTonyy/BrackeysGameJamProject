@@ -52,6 +52,11 @@ public class EventManager : MonoBehaviour
     {
         Instance?.onPlayMoveCard?.Invoke(step, turnUsed);
     }
+    public event Action<int,int> onPlayMoveAnimation;
+    public void PlayMoveAnimation(int step, int turnUsed)
+    {
+        Instance?.onPlayMoveAnimation?.Invoke(step,turnUsed);
+    }
     public event Action onPlayerMoveEnd;
     public void PlayerMoveEnd()
     {
@@ -66,6 +71,11 @@ public class EventManager : MonoBehaviour
     public void ClickDrawCard()
     {
         Instance?.onClickDrawCard?.Invoke();
+    }
+    public event Action<AudioClip> onPlaySFX;
+    public void PlaySFX(AudioClip audioClip)
+    {
+        Instance?.onPlaySFX?.Invoke(audioClip);
     }
     #region Grid Events
     public event Action<Vector3> onEnterPortalGrid;
@@ -122,4 +132,5 @@ public class EventManager : MonoBehaviour
         Instance?.onDistanceChange?.Invoke(amount);
     }
     #endregion
+
 }

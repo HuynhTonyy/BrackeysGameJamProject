@@ -36,7 +36,14 @@ public class GameManager : MonoBehaviour
     private int currentTurnToSink = 0;
     [SerializeField] private GameObject endPanel;
     public static GameManager Instance { get; private set; }
-
+    [SerializeField] private AudioClip powerUpCip;
+    [SerializeField] private AudioClip thunderStrikeCip;
+    [SerializeField] private AudioClip scountCip;
+    [SerializeField] private AudioClip loseClip;
+    [SerializeField] private AudioClip victoryClip; 
+    [SerializeField] private GameObject startPanel;
+    [SerializeField] private GameObject inGamePanel;
+    [SerializeField] private TMP_Text endText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private GameManager()
     {
@@ -69,6 +76,7 @@ public class GameManager : MonoBehaviour
         stamina--;
         if (stamina <= 0)
         {
+            endText.SetText("Better luck next time!");
             endPanel.SetActive(true);
             return;
         }
@@ -86,6 +94,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject); // Persist across scenes
+        InitGrid();
     }
     void Start()
     {
@@ -95,8 +104,17 @@ public class GameManager : MonoBehaviour
         staminaText.SetText(stamina.ToString());
         gridText.SetText(currentGrid.ToString());
         player.SetActive(true);
-        InitGrid();
-
+        inGamePanel.SetActive(false);   
+        startPanel.SetActive(true);
+    }
+    public void StartGame()
+    {
+        startPanel.SetActive(false);
+        inGamePanel.SetActive(true);
+    }
+    public void Restart()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
     void InitGrid()
     {
@@ -104,7 +122,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < gridNum; i++)
         {
             Vector3 gridPos = GetNewGridPosition(i);
-            // Debug.Log(i+"-"+gridPos);
             int randomIndex = Random.Range(0, gridTypes.Count);
             if (i == 0)
             {
@@ -259,24 +276,14 @@ public class GameManager : MonoBehaviour
     //     return gridPos;
     // }
     // Update is called once per frame
-    void Update()
-    {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && stamina > 0)
-        {
-            int moveStep = Random.Range(1, 4);
-            MovePlayer(moveStep, 1);
-        }
-        if (Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-        }
-    }
     public void MovePlayer(int step, int staminaUsed)
     {
+        int stepToGo = step;
         currentGrid += step;
         if (currentGrid >= gridNum)
         {
             currentGrid = gridNum - 1;
+            stepToGo = gridNum - 1 - currentGrid;
         }
         if (staminaUsed > 0)
         {
@@ -287,7 +294,7 @@ public class GameManager : MonoBehaviour
         }
         gridText.SetText(currentGrid.ToString());
         ClearCloudsInDistance(currentGrid, vision);
-
+        EventManager.Instance.PlayMoveAnimation(stepToGo,0);
     }
     void ClearCloudsInDistance(int startGrid, int distance)
     {
@@ -310,11 +317,13 @@ public class GameManager : MonoBehaviour
     {
         if (currentGrid == gridNum - 1)
         {
+            endText.SetText("Victory");
             endPanel.SetActive(true);
 
         }
         else if (stamina == 0 )
         {
+            endText.SetText("Better luck next time!");
             endPanel.SetActive(true);
 
         }
@@ -334,6 +343,7 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.MoveForward:
                         isOperating = true;
+                        EventManager.Instance.PlaySFX(powerUpCip);
                         StartCoroutine(MoveCoroutine(1));
                         break;
                     case GridSO.GridType.MoveBackward:
@@ -342,13 +352,16 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.AddCard:
                         isOperating = false;
+                        EventManager.Instance.PlaySFX(powerUpCip);
                         EventManager.Instance.EnterAddCardGrid();
                         break;
                     case GridSO.GridType.DropCard:
                         isOperating = false;
+                        EventManager.Instance.PlaySFX(powerUpCip);
                         EventManager.Instance.EnterDropCardGrid();
                         break;
                     case GridSO.GridType.CursedFrog:
+                        EventManager.Instance.PlaySFX(thunderStrikeCip);
                         stamina--;
                         currentTurnToSink++;
                         EventManager.Instance.StaminaChange(-1);
@@ -362,10 +375,12 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.Scout:
                         isOperating = false;
+                        EventManager.Instance.PlaySFX(scountCip);
                         ClearCloudsInDistance(currentGrid, 6);
                         break;
                     case GridSO.GridType.Swamp:
                         isOperating = false;
+                        EventManager.Instance.PlaySFX(thunderStrikeCip);
                         if (stamina > 2)
                         {
                             stamina -= 2;
@@ -440,6 +455,7 @@ public class GameManager : MonoBehaviour
         sinkedGridIndex = sinkToIndex;
         if (currentGrid < sinkedGridIndex)
         {
+            endText.SetText("Better luck next time!");
             endPanel.SetActive(true);
         }
     }
