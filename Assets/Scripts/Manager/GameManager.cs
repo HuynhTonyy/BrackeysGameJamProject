@@ -47,14 +47,17 @@ public class GameManager : MonoBehaviour
         if (EventManager.Instance == null) return;
         EventManager.Instance.onPlayerMoveEnd += GridAction;
         EventManager.Instance.onPlayMoveCard += MovePlayer;
+        EventManager.Instance.onIslandSinkEnd += CheckSinkedGrid;
     }
     private void OnDisable() {
         if (EventManager.Instance == null) return;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
+        EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     private void OnDestroy() {
         if (EventManager.Instance == null) return;
+        EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
@@ -261,18 +264,12 @@ public class GameManager : MonoBehaviour
         {
             currentGrid = gridNum - 1;
         }
-        if (currentGrid <= sinkedGridIndex)
-        {
-            Debug.Log("Da bi pha");
-            endPanel.SetActive(true);
-            // return;
-        }
         if (staminaUsed > 0)
         {
             stamina -= staminaUsed;
             EventManager.Instance.StaminaChange(-staminaUsed);
             staminaText.SetText(stamina.ToString());
-            Sink();
+            currentTurnToSink += staminaUsed;
         }
         gridText.SetText(currentGrid.ToString());
         ClearCloudsInDistance(currentGrid, vision);
@@ -281,12 +278,11 @@ public class GameManager : MonoBehaviour
     void ClearCloudsInDistance(int startGrid, int distance)
     {
         if (startGrid == 0) return;
-        for (int i = 0; i <= distance; i++)
+        for (int i = 0; i < startGrid+distance; i++)
         {
-            int cloudIndex = currentGrid - 1 + i;
-            if (cloudIndex < clouds.Count)
+            if (i < clouds.Count)
             {
-                clouds[cloudIndex].GetComponent<Cloud>().Disappear();
+                clouds[i].GetComponent<Cloud>().Disappear();
 
             }
             else
@@ -298,13 +294,12 @@ public class GameManager : MonoBehaviour
     }
     void GridAction()
     {
-
         if (currentGrid == gridNum - 1)
         {
             endPanel.SetActive(true);
 
         }
-        else if (stamina == 0 || currentGrid <= sinkedGridIndex)
+        else if (stamina == 0 )
         {
             endPanel.SetActive(true);
 
@@ -341,6 +336,7 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.CursedFrog:
                         stamina--;
+                        currentTurnToSink++;
                         EventManager.Instance.StaminaChange(-1);
                         isOperating = false;
                         staminaText.SetText(stamina.ToString());
@@ -361,7 +357,7 @@ public class GameManager : MonoBehaviour
                             stamina -= 2;
                             EventManager.Instance.StaminaChange(-2);
                             staminaText.SetText(stamina.ToString());
-
+                            currentTurnToSink += 2;
                         }
                         else
                         {
@@ -372,7 +368,7 @@ public class GameManager : MonoBehaviour
                         break;
                     case GridSO.GridType.Teleport:
                         isOperating = true;
-                        Sink();
+                        currentTurnToSink++;
                         StartCoroutine(TeleportCoroutine());
                         break;
                     default:
@@ -393,36 +389,44 @@ public class GameManager : MonoBehaviour
         if (!isOperating)
         {
             EventManager.Instance.CompleteAction();
+            Sink();
             isOperating = false;
         }
     }
     void Sink()
     {
-        if(turnToSink <=0 || sinkNum <=0) return;
-        currentTurnToSink++;
-        if(currentTurnToSink >= turnToSink)
+        if (turnToSink <= 0 || sinkNum <= 0) return;
+        int sinkMultiply = currentTurnToSink/turnToSink;
+
+        if (sinkMultiply > 0)
         {
-            currentTurnToSink = 0;
-            int sinkToIndex = sinkedGridIndex + sinkNum;
-            if(sinkToIndex >= gridNum -1)
+            currentTurnToSink %= turnToSink;
+            int sinkToIndex = sinkedGridIndex + sinkNum * sinkMultiply;
+            if (sinkToIndex >= gridNum - 1)
             {
-                sinkToIndex = gridNum -2;
+                sinkToIndex = gridNum - 2;
             }
             for (int i = sinkedGridIndex; i < sinkToIndex; i++)
             {
-                grids[i].Item2.SetActive(false);
-                if(i < paths.Count)
+                grids[i].Item2.GetComponent<Island>().PlayIslandSinkEffect(sinkToIndex);
+                if (i < paths.Count)
                 {
                     paths[i].SetActive(false);
                 }
-                
+
             }
-            sinkedGridIndex = sinkToIndex;
-            if(currentGrid <= sinkedGridIndex)
+            if (currentGrid <= sinkedGridIndex)
             {
-                Debug.Log("Da bi pha");
                 endPanel.SetActive(true);
             }
+        }
+    }
+    private void CheckSinkedGrid(int sinkToIndex)
+    {
+        sinkedGridIndex = sinkToIndex;
+        if (currentGrid < sinkedGridIndex)
+        {
+            endPanel.SetActive(true);
         }
     }
     IEnumerator MoveCoroutine(int step)
