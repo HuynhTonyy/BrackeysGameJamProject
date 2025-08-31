@@ -10,8 +10,8 @@ public class HandManager : MonoBehaviour
     [SerializeField] private int maxCardSize;
     [SerializeField] private GameObject spawnPoint;
     [SerializeField] private SplineContainer splineContainer, chooseCardSplineContainer;
-    [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip drawCardSound;
+    [SerializeField] private AudioClip dropCardSound;
     [SerializeField] private List<ActionCardSO> cardTypes;
     [SerializeField] private GameObject hand, deck;
     private List<GameObject> handCards = new();
@@ -49,7 +49,7 @@ public class HandManager : MonoBehaviour
 
     }
     public void OnClickDrawCard() {
-        EventManager.Instance.CardChange(1);
+        
         DrawCard();
     }
     private void ShowHand()
@@ -112,6 +112,7 @@ public class HandManager : MonoBehaviour
             }); // then destroy it
         CheckEmptyHand();
         UpdateCardPosition(handCards, splineContainer.Spline);
+        EventManager.Instance.PlaySFX(dropCardSound);
 
     }
     [SerializeField] public HandState currentHandState;
@@ -284,13 +285,11 @@ public class HandManager : MonoBehaviour
         {
             actionCard.Init(cardTypes[index], this, CardLocation.Hand); // pass self as manager
         }
+        EventManager.Instance.CardChange(1);
         handCards.Add(cardSpawned);
         handCards = SortCardByType(handCards);
         UpdateCardPosition(handCards, splineContainer.Spline);
-        if (audioSource != null && drawCardSound != null)
-        {
-            audioSource.PlayOneShot(drawCardSound);
-        }
+        EventManager.Instance.PlaySFX(drawCardSound);
     }
     private void UpdateCardPosition(List<GameObject> list = null, Spline spline = null)
     {
@@ -357,10 +356,7 @@ public class HandManager : MonoBehaviour
         }
         selectionCards = SortCardByType(selectionCards);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
-        if (audioSource != null && drawCardSound != null)
-        {
-            audioSource.PlayOneShot(drawCardSound);
-        }
+        EventManager.Instance.PlaySFX(drawCardSound);
     }
     public void AddCardToHand(ActionCard card)
     {

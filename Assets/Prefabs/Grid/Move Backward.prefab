@@ -52,6 +52,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bombObject: {fileID: 3836553868185080037}
   bombEffect: {fileID: 4796179599796895469}
+  explosionClip: {fileID: 8300000, guid: b6a6109211a04bf44a3f5a6bfc1450bc, type: 3}
 --- !u!199 &-5512123653696442855
 ParticleSystemRenderer:
   serializedVersion: 6

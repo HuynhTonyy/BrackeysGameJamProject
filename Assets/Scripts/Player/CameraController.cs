@@ -75,7 +75,7 @@ public class SimpleCameraZoomNewInput : MonoBehaviour
 
     void HandleDrag()
     {
-        if (Mouse.current.leftButton.isPressed)
+        if (Mouse.current.rightButton.isPressed)
         {
             Vector3 mousePos = Mouse.current.position.ReadValue();
             if (lastMousePos != Vector3.zero)
@@ -87,7 +87,7 @@ public class SimpleCameraZoomNewInput : MonoBehaviour
                 // keep Y locked
                 var pos = mainCamera.transform.position;
                 pos.y = fixedY;
-                pos.x = Mathf.Clamp(pos.x, -10f, 200f);
+                pos.x = Mathf.Clamp(pos.x, -10f, 220f);
                 mainCamera.transform.position = pos;
             }
             lastMousePos = mousePos;

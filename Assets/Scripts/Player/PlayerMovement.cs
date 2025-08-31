@@ -13,21 +13,21 @@ public class PlayerMovement : MonoBehaviour
     private float newJumpDistance;
     private void OnEnable()
     {
-        EventManager.Instance.onPlayMoveCard += PlayMoveAnimation;
+        EventManager.Instance.onPlayMoveAnimation += PlayMoveAnimation;
         EventManager.Instance.onEnterMoveForwardGrid += PlayMoveAnimation;
         EventManager.Instance.onExplodeBomb += PlayKnockbackAnimation;
         EventManager.Instance.onEnterPortalGrid += AppearInLocation;
     }
     private void OnDisable()
     {
-        EventManager.Instance.onPlayMoveCard -= PlayMoveAnimation;
+        EventManager.Instance.onPlayMoveAnimation -= PlayMoveAnimation;
         EventManager.Instance.onEnterPortalGrid -= AppearInLocation;
         EventManager.Instance.onExplodeBomb -= PlayKnockbackAnimation;
         EventManager.Instance.onEnterMoveForwardGrid -= PlayMoveAnimation;
     }
     private void OnDestroy() {
         EventManager.Instance.onEnterPortalGrid -= AppearInLocation;
-        EventManager.Instance.onPlayMoveCard -= PlayMoveAnimation;
+        EventManager.Instance.onPlayMoveAnimation -= PlayMoveAnimation;
         EventManager.Instance.onExplodeBomb -= PlayKnockbackAnimation;
         EventManager.Instance.onEnterMoveForwardGrid -= PlayMoveAnimation;
         
@@ -59,7 +59,6 @@ public class PlayerMovement : MonoBehaviour
             transform.position = currentPos;
             EventManager.Instance.PlayerMoveEnd();
         });
-
     }
     void PlayKnockbackAnimation()
     {
