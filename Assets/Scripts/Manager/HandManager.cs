@@ -48,7 +48,7 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.OnCompleteAction -= ShowHand;
 
     }
-    private void AddCard() {
+    public void OnClickDrawCard() {
         EventManager.Instance.CardChange(1);
         DrawCard();
     }
@@ -269,7 +269,7 @@ public class HandManager : MonoBehaviour
         return sortedList;
     }
     // 🔹 Generic draw (random or specific)
-    public void DrawCard(GameObject cardPrefab = null)
+    private void DrawCard(GameObject cardPrefab = null)
     {
         if (handCards.Count >= maxCardSize)
         {   // Shake the hand if full
