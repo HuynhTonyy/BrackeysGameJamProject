@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
 
 [CreateAssetMenu(fileName = "ActionCardSO", menuName = "Scriptable Objects/ActionCardSO")]
 public class ActionCardSO : ScriptableObject
