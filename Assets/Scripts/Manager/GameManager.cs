@@ -48,18 +48,32 @@ public class GameManager : MonoBehaviour
         EventManager.Instance.onPlayerMoveEnd += GridAction;
         EventManager.Instance.onPlayMoveCard += MovePlayer;
         EventManager.Instance.onIslandSinkEnd += CheckSinkedGrid;
+        EventManager.Instance.onClickDrawCard += ConsumeStamina;
     }
     private void OnDisable() {
         if (EventManager.Instance == null) return;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
+        EventManager.Instance.onClickDrawCard -= ConsumeStamina;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     private void OnDestroy() {
         if (EventManager.Instance == null) return;
         EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
+        EventManager.Instance.onClickDrawCard -= ConsumeStamina;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
+    }
+    private void ConsumeStamina()
+    {
+        stamina--;
+        if (stamina <= 0)
+        {
+            endPanel.SetActive(true);
+            return;
+        }
+        staminaText.SetText(stamina.ToString());
+        EventManager.Instance.StaminaChange(-1);
     }
     void Awake()
     {
@@ -432,10 +446,10 @@ public class GameManager : MonoBehaviour
     IEnumerator MoveCoroutine(int step)
     {
         yield return new WaitForSeconds(0.25f);
-        if(step > 0)
-            EventManager.Instance.EnterMoveForwardGrid(step,0);
+        if (step > 0)
+            EventManager.Instance.EnterMoveForwardGrid(step, 0);
         else
-            EventManager.Instance.EnterMoveBackwardGrid(step);
+            grids[currentGrid].Item2.GetComponent<Bomb>().ActivateBomb();
         EventManager.Instance.DistanceChange(step);
         MovePlayer(step,0);
     }

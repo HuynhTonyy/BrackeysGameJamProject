@@ -10,15 +10,7 @@ public class Bomb : MonoBehaviour
         bombObject.SetActive(false);
         bombEffect.SetActive(false);
     }
-    private void OnEnable()
-    {
-        EventManager.Instance.onEnterMoveBackwardGrid += ActivateBomb;
-    }
-    private void OnDisable()
-    {
-        EventManager.Instance.onEnterMoveBackwardGrid -= ActivateBomb;
-    }
-    void ActivateBomb(int step)
+    public void ActivateBomb()
     {
         StartCoroutine(ActivateBombCoroutine());
     }
