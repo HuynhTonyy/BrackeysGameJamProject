@@ -22,17 +22,17 @@ public class HandManager : MonoBehaviour
     {
         EventManager.Instance.onCardPlayAnimationEnd += RemoveCard;
         EventManager.Instance.onPlayCard += PlayCardAbility;
-        EventManager.Instance.onEnterAddCardGrid += DrawCard;
+        EventManager.Instance.onEnterAddCardGrid += SelectCardToHand;
         EventManager.Instance.onEnterDropCardGrid += DropRandomCard;
         EventManager.Instance.OnCompleteAction += ShowHand;
         EventManager.Instance.onPlayerMoveEnd += CheckEmptyHand;
-        
+
     }
     private void OnDisable()
     {
         EventManager.Instance.onCardPlayAnimationEnd -= RemoveCard;
         EventManager.Instance.onPlayCard -= PlayCardAbility;
-        EventManager.Instance.onEnterAddCardGrid -= DrawCard;
+        EventManager.Instance.onEnterAddCardGrid -= SelectCardToHand;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
         EventManager.Instance.onPlayerMoveEnd -= CheckEmptyHand;
         EventManager.Instance.OnCompleteAction -= ShowHand;
@@ -42,7 +42,7 @@ public class HandManager : MonoBehaviour
     {
         EventManager.Instance.onCardPlayAnimationEnd -= RemoveCard;
         EventManager.Instance.onPlayCard -= PlayCardAbility;
-        EventManager.Instance.onEnterAddCardGrid -= DrawCard;
+        EventManager.Instance.onEnterAddCardGrid -= SelectCardToHand;
         EventManager.Instance.onPlayerMoveEnd -= CheckEmptyHand;
         EventManager.Instance.onEnterDropCardGrid -= DropRandomCard;
         EventManager.Instance.OnCompleteAction -= ShowHand;
@@ -112,7 +112,7 @@ public class HandManager : MonoBehaviour
             }); // then destroy it
         CheckEmptyHand();
         UpdateCardPosition(handCards, splineContainer.Spline);
-        
+
     }
     [SerializeField] public HandState currentHandState;
     [SerializeField] public DeckState currentDeckState;
@@ -347,7 +347,7 @@ public class HandManager : MonoBehaviour
             ActionCard actionCard = cardSpawned.GetComponent<ActionCard>();
             if (actionCard != null)
             {
-                actionCard.Init(cardTypes[index], this,CardLocation.Deck);
+                actionCard.Init(cardTypes[index], this, CardLocation.Deck);
                 if (currentDeckState == DeckState.waiting)
                     actionCard.EnablePlay(false);
                 else
@@ -379,6 +379,19 @@ public class HandManager : MonoBehaviour
         ChangeDeckState(DeckState.hiding);
     }
 
+    private void SelectCardToHand(GameObject cardPrefab = null)
+    {
+        if (currentDeckState != DeckState.hiding && handCards.Count < maxCardSize)
+        {
+            ChangeDeckState(DeckState.hiding);
+            ChangeHandState(HandState.selecting);
+        }
+        else
+        {
+            ChangeDeckState(DeckState.selecting);
+            ChangeHandState(HandState.waiting);
+        }
+    }
     public void RemoveCard(GameObject card)
     {
         if (card == null) return;
@@ -401,20 +414,7 @@ public class HandManager : MonoBehaviour
         {
             DrawCard();
         }
-        if (Keyboard.current.eKey.wasPressedThisFrame)
-        {
 
-            if (currentDeckState != DeckState.hiding)
-            {
-                ChangeDeckState(DeckState.hiding);
-                ChangeHandState(HandState.selecting);
-            }
-            else
-            {
-                ChangeDeckState(DeckState.selecting);
-                ChangeHandState(HandState.waiting);
-            }
-        }
         if (Keyboard.current.tKey.wasPressedThisFrame)
         {
             ChangeDeckState(DeckState.hiding);
