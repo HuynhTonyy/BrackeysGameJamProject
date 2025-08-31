@@ -222,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &104876236
 RectTransform:
   m_ObjectHideFlags: 0
@@ -675,8 +675,12 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   player: {fileID: 0}
   mapZoomSize: 20
-  playerZoomSize: 5
+  playerZoomSize: 3
   zoomDuration: 2
+  scrollZoomSpeed: 5
+  dragSpeed: 0.05
+  minZoom: 2
+  maxZoom: 40
 --- !u!4 &404868428
 Transform:
   m_ObjectHideFlags: 0
@@ -1010,6 +1014,10 @@ MonoBehaviour:
   mapZoomSize: 20
   playerZoomSize: 5
   zoomDuration: 2
+  scrollZoomSpeed: 10
+  dragSpeed: 0.025
+  minZoom: 5
+  maxZoom: 9
 --- !u!1 &613417524
 GameObject:
   m_ObjectHideFlags: 0
