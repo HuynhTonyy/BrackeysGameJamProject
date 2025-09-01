@@ -1493,7 +1493,7 @@ MonoBehaviour:
   playerZoomSize: 5
   zoomDuration: 2
   scrollZoomSpeed: 10
-  dragSpeed: 0.025
+  dragSpeed: 0.001
   minZoom: 5
   maxZoom: 9
 --- !u!1 &613417524
