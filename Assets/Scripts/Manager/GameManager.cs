@@ -286,6 +286,7 @@ public class GameManager : MonoBehaviour
         }
         if (staminaUsed > 0)
         {
+            EventManager.Instance.PlayMoveAnimation(stepToGo,0);
             stamina -= staminaUsed;
             EventManager.Instance.StaminaChange(-staminaUsed);
             staminaText.SetText(stamina.ToString());
@@ -293,7 +294,7 @@ public class GameManager : MonoBehaviour
         }
         gridText.SetText(currentGrid.ToString());
         ClearCloudsInDistance(currentGrid, vision);
-        EventManager.Instance.PlayMoveAnimation(stepToGo,0);
+        
     }
     void ClearCloudsInDistance(int startGrid, int distance)
     {
@@ -398,6 +399,9 @@ public class GameManager : MonoBehaviour
                         isOperating = true;
                         currentTurnToSink++;
                         StartCoroutine(TeleportCoroutine());
+                        break;
+                    case GridSO.GridType.Start:
+                        isOperating = false;
                         break;
                     default:
                         break;

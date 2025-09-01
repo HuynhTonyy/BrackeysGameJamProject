@@ -58,6 +58,10 @@ public class HandManager : MonoBehaviour
     }
     void PlayCardAbility(ActionCardSO cardData)
     {
+        if (currentDeckState == DeckState.selecting)
+        {
+            AddCardToHand(selectionCards[0].GetComponent<ActionCard>());
+        }
         if (cardData.cardType == CardType.Move)
         {
             ChangeHandState(HandState.hiding);
@@ -377,15 +381,15 @@ public class HandManager : MonoBehaviour
 
     private void SelectCardToHand(GameObject cardPrefab = null)
     {
-        if (currentDeckState != DeckState.hiding && handCards.Count < maxCardSize)
-        {
-            ChangeDeckState(DeckState.hiding);
-            ChangeHandState(HandState.selecting);
-        }
-        else
+        if (currentDeckState == DeckState.hiding && handCards.Count < maxCardSize)
         {
             ChangeDeckState(DeckState.selecting);
             ChangeHandState(HandState.waiting);
+        }
+        else
+        {
+            ChangeDeckState(DeckState.hiding);
+            ChangeHandState(HandState.selecting);
         }
     }
     public void RemoveCard(GameObject card)
@@ -403,26 +407,5 @@ public class HandManager : MonoBehaviour
         // Recalculate positions
         UpdateCardPosition(handCards, splineContainer.Spline);
         UpdateCardPosition(selectionCards, chooseCardSplineContainer.Spline);
-    }
-    private void Update()
-    {
-        if (Keyboard.current.enterKey.wasPressedThisFrame)
-        {
-            DrawCard();
-        }
-
-        if (Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            ChangeDeckState(DeckState.hiding);
-            if (currentHandState != HandState.hiding)
-            {
-                ChangeHandState(HandState.hiding);
-            }
-            else
-            {
-                ChangeHandState(HandState.selecting);
-            }
-
-        }
     }
 }
