@@ -67,15 +67,20 @@ public class EventManager : MonoBehaviour
     {
         Instance?.OnCompleteAction?.Invoke();
     }
-    public event Action onClickDrawCard;
-    public void ClickDrawCard()
+    public event Action<int> onClickDrawCard;
+    public void ClickDrawCard(int staminaUsed)
     {
-        Instance?.onClickDrawCard?.Invoke();
+        Instance?.onClickDrawCard?.Invoke(staminaUsed);
     }
     public event Action<AudioClip> onPlaySFX;
     public void PlaySFX(AudioClip audioClip)
     {
         Instance?.onPlaySFX?.Invoke(audioClip);
+    }
+    public event Action onSelectDeskShow;
+    public void SelectDeskShow()
+    {
+        Instance?.onSelectDeskShow?.Invoke();
     }
     #region Grid Events
     public event Action<Vector3> onEnterPortalGrid;

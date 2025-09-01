@@ -3226,6 +3226,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 78b496eea7734444da358fc4d3f7ead9, type: 2}
   hand: {fileID: 1322755015}
   deck: {fileID: 1299191885}
+  drawBtn: {fileID: 988445818}
   currentHandState: 0
   currentDeckState: 0
 --- !u!1 &1322755015

@@ -16,6 +16,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     private bool isOpening = false;
+    private bool isChanged = false;
     private void Awake()
     {
         if (Instance == null)
@@ -30,10 +31,12 @@ public class AudioManager : MonoBehaviour
     }
     private void Start()
     {
-
-        PlayBackgroundMusic();
-        musicSlider.value = bgSource.volume;
-        sfxSlider.value = sfxSource.volume;
+        if (!isChanged)
+        {
+            PlayBackgroundMusic();
+            musicSlider.value = bgSource.volume;
+            sfxSlider.value = sfxSource.volume;
+        }
     }
     private void OnEnable()
     {
@@ -49,10 +52,12 @@ public class AudioManager : MonoBehaviour
     }
     public void ChangeBGVolume()
     {
+        isChanged = true;
         bgSource.volume = musicSlider.value;
     }
     public void ChangeSFXVolume()
     {
+        isChanged = true;
         sfxSource.volume = sfxSlider.value;
     }
     private void PlayBackgroundMusic()

@@ -17,6 +17,7 @@ public class HandManager : MonoBehaviour
     private List<GameObject> handCards = new();
     private List<GameObject> selectionCards = new();
     private bool isRepeat { get; set; } = false;
+    [SerializeField] private GameObject drawBtn;
 
     private void OnEnable()
     {
@@ -48,16 +49,22 @@ public class HandManager : MonoBehaviour
         EventManager.Instance.OnCompleteAction -= ShowHand;
 
     }
-    public void OnClickDrawCard() {
+    public void OnClickDrawCard()
+    {
+        DrawCard(staminaUsed:-1);
         
-        DrawCard();
     }
     private void ShowHand()
     {
+        if (currentDeckState != DeckState.selecting)
+        {
+            drawBtn.SetActive(true);
+        }
         ChangeHandState(HandState.selecting);
     }
     void PlayCardAbility(ActionCardSO cardData)
     {
+        drawBtn.SetActive(false);
         if (currentDeckState == DeckState.selecting)
         {
             AddCardToHand(selectionCards[0].GetComponent<ActionCard>());
@@ -79,6 +86,7 @@ public class HandManager : MonoBehaviour
         {
             if (cardData.tradeOffType == TradeOffType.Repeat)
             {
+                drawBtn.SetActive(true);
                 isRepeat = true;
                 DropRandomCard();
             }
@@ -90,7 +98,7 @@ public class HandManager : MonoBehaviour
         if (handCards.Count <= 0)
         {
             DrawCard();
-            DrawCard();
+            DrawCard(staminaUsed:-1);
         }
     }
     public void DropRandomCard()
@@ -146,6 +154,7 @@ public class HandManager : MonoBehaviour
         {
             case DeckState.selecting:
                 SetDeckPlayble(true);
+                drawBtn.SetActive(false);
                 break;
             // case DeckState.waiting:
             //     // maybe show empty deck or idle
@@ -190,6 +199,7 @@ public class HandManager : MonoBehaviour
 
     private void HideSelectedDeck()
     {
+        drawBtn.SetActive(true);
         foreach (var card in selectionCards)
         {
             Destroy(card);
@@ -274,7 +284,7 @@ public class HandManager : MonoBehaviour
         return sortedList;
     }
     // 🔹 Generic draw (random or specific)
-    private void DrawCard(GameObject cardPrefab = null)
+    private void DrawCard(GameObject cardPrefab = null, int staminaUsed = 0)
     {
         if (handCards.Count >= maxCardSize)
         {   // Shake the hand if full
@@ -294,6 +304,7 @@ public class HandManager : MonoBehaviour
         handCards = SortCardByType(handCards);
         UpdateCardPosition(handCards, splineContainer.Spline);
         EventManager.Instance.PlaySFX(drawCardSound);
+        EventManager.Instance.ClickDrawCard(staminaUsed);
     }
     private void UpdateCardPosition(List<GameObject> list = null, Spline spline = null)
     {

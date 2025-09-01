@@ -54,25 +54,25 @@ public class GameManager : MonoBehaviour
         EventManager.Instance.onPlayerMoveEnd += GridAction;
         EventManager.Instance.onPlayMoveCard += MovePlayer;
         EventManager.Instance.onIslandSinkEnd += CheckSinkedGrid;
-        EventManager.Instance.onClickDrawCard += ConsumeStamina;
+        EventManager.Instance.onClickDrawCard += SetStamina;
     }
     private void OnDisable() {
         if (EventManager.Instance == null) return;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
-        EventManager.Instance.onClickDrawCard -= ConsumeStamina;
+        EventManager.Instance.onClickDrawCard -= SetStamina;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
     private void OnDestroy() {
         if (EventManager.Instance == null) return;
         EventManager.Instance.onIslandSinkEnd -= CheckSinkedGrid;
-        EventManager.Instance.onClickDrawCard -= ConsumeStamina;
+        EventManager.Instance.onClickDrawCard -= SetStamina;
         EventManager.Instance.onPlayerMoveEnd -= GridAction;
         EventManager.Instance.onPlayMoveCard -= MovePlayer;
     }
-    private void ConsumeStamina()
+    private void SetStamina(int staminaUsed)
     {
-        stamina--;
+        stamina+=staminaUsed;
         if (stamina <= 0)
         {
             endText.SetText("Better luck next time!");
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         staminaText.SetText(stamina.ToString());
-        EventManager.Instance.StaminaChange(-1);
+        EventManager.Instance.StaminaChange(staminaUsed);
     }
     void Awake()
     {
