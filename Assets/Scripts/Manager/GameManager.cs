@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using DG.Tweening;
-using UnityEditor.PackageManager;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] List<GameObject> islandBases;
