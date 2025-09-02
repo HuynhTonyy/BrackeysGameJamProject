@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject startPanel;
     [SerializeField] private GameObject inGamePanel;
     [SerializeField] private TMP_Text endText;
+    [SerializeField] private TMP_Text sunkText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private GameManager()
     {
@@ -73,6 +74,7 @@ public class GameManager : MonoBehaviour
     private void SetStamina(int staminaUsed)
     {
         stamina+=staminaUsed;
+        Sink();
         if (stamina <= 0)
         {
             endText.SetText("Better luck next time!");
@@ -428,12 +430,17 @@ public class GameManager : MonoBehaviour
     void Sink()
     {
         if (turnToSink <= 0 || sinkNum <= 0) return;
-        int sinkMultiply = currentTurnToSink/turnToSink;
-
-        if (sinkMultiply > 0)
+        int sinkToIndex = sinkedGridIndex + sinkNum;
+        for (int i = sinkedGridIndex; i < sinkedGridIndex+sinkNum; i++)
+            {
+                if(i < grids.Count-2)
+                    grids[i].Item2.transform        
+                    .DOShakePosition(0.5f, new Vector3(0.15f, 0.15f, 0f), 50, 180, false, true)
+                    .SetLoops(-1, LoopType.Yoyo);
+            }
+        if (currentTurnToSink >= turnToSink)
         {
-            currentTurnToSink %= turnToSink;
-            int sinkToIndex = sinkedGridIndex + sinkNum * sinkMultiply;
+            currentTurnToSink = 0;
             if (sinkToIndex >= gridNum - 1)
             {
                 sinkToIndex = gridNum - 2;
@@ -445,7 +452,6 @@ public class GameManager : MonoBehaviour
                 {
                     paths[i].SetActive(false);
                 }
-
             }
             if (currentGrid <= sinkedGridIndex)
             {
@@ -477,7 +483,7 @@ public class GameManager : MonoBehaviour
         int min = currentGrid - 6;
         if (currentGrid - 6 <= sinkedGridIndex)
         {
-            min = currentGrid - sinkedGridIndex;
+            min = currentGrid - sinkedGridIndex + 1;
         }
         int max = gridNum - 2;
         if (currentGrid + 6 < gridNum - 2)
